@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { IsEmail, IsString, IsUUID } from 'class-validator';
 
-export class CreateUserDto implements Partial<Prisma.UserCreateInput> {
+export class RegisterUserDto implements Partial<Prisma.UserCreateInput> {
   @ApiProperty({
     description: 'The email address of the user',
     example: 'john.doe@example.com',
@@ -18,7 +18,7 @@ export class CreateUserDto implements Partial<Prisma.UserCreateInput> {
   plainPassword: string;
 }
 
-export class CreateUserResponseDto implements Partial<CreateUserDto> {
+export class RegisterUserResponseDto implements Partial<RegisterUserDto> {
   @ApiProperty({
     description: 'The identifier (UUID) of the user',
     example: '69a55e21-8851-4393-b937-9d207bbe3003',
@@ -32,4 +32,20 @@ export class CreateUserResponseDto implements Partial<CreateUserDto> {
   })
   @IsString()
   email: string;
+}
+
+export class LoginUserDto implements Partial<User> {
+  @ApiProperty({
+    description: 'The email address of the user',
+    example: 'john.doe@example.com',
+  })
+  @IsEmail()
+  email: string;
+
+  @ApiProperty({
+    description: 'The plain password of the user',
+    example: 'SuperSecurePassword123!',
+  })
+  @IsString()
+  plainPassword: string;
 }
