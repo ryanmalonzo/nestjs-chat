@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Prisma, User } from '@prisma/client';
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString, IsUUID } from 'class-validator';
 
 export class RegisterUserDto implements Partial<Prisma.UserCreateInput> {
   @ApiProperty({
@@ -32,6 +32,14 @@ export class LoginUserDto implements Partial<User> {
   })
   @IsString()
   plainPassword: string;
+}
+
+export class JwtPayload {
+  @IsUUID()
+  sub: string;
+
+  @IsEmail()
+  email: string;
 }
 
 export class JwtResponse {
