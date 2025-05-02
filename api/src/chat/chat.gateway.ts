@@ -11,7 +11,7 @@ import { Server, Socket } from 'socket.io';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SocketWithUserDto } from './chat.dto';
 
-@WebSocketGateway()
+@WebSocketGateway(Number(process.env.PORT) ?? 3000, { cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection {
   @WebSocketServer() server: Server;
 
