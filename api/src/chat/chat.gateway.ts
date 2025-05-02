@@ -22,10 +22,9 @@ export class ChatGateway implements OnGatewayConnection {
   @UseGuards(AuthGuard)
   @SubscribeMessage('message')
   handleMessage(
-    @MessageBody() data: string,
+    @MessageBody() message: string,
     @ConnectedSocket() client: SocketWithUserDto,
-  ): string {
-    console.log(client.user);
-    return data;
+  ): void {
+    console.log(`${client.user.email}: ${message}`);
   }
 }
