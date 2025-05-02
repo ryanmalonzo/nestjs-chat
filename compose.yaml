@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:17
+    container_name: nestjs-chat-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-esgi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-esgi}
+      POSTGRES_DB: ${POSTGRES_DB:-esgi}
+    restart: unless-stopped
+
+  adminer:
+    image: adminer
+    container_name: nestjs-chat-adminer
+    ports:
+      - "8080:8080"
+
+volumes:
+  db-data:
