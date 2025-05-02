@@ -3,9 +3,17 @@ import { BcryptModule } from './bcrypt/bcrypt.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
-  imports: [AuthModule, BcryptModule, ConfigModule.forRoot(), PrismaModule],
+  imports: [
+    AuthModule,
+    BcryptModule,
+    ChatModule,
+    ConfigModule.forRoot(),
+    PrismaModule,
+    ChatModule,
+  ],
   controllers: [],
   providers: [],
 })

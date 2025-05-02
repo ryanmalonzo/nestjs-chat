@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -22,6 +22,7 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_SECRET,
       });
 
+      // See chat.dto.ts (SocketWithUserDto)
       request['user'] = payload;
     } catch {
       throw new UnauthorizedException();
@@ -29,8 +30,11 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+  private extractTokenFromHeader(request: Socket): string | undefined {
+    // When using socket.io, the headers are under `request.handshake.headers`,
+    // not `request.headers`
+    const [type, token] =
+      request.handshake.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }
 }
