@@ -16,15 +16,13 @@ export default function Chat() {
 
   useEffect(() => {
     if (!socket) {
-      // const newSocket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
-      const newSocket = io("http://localhost:3000", {
+      const newSocket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
         extraHeaders: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         withCredentials: true,
       });
 
-      // Log socket ID when connected
       newSocket.on("connect", () => {
         console.log("Connected to socket server with ID:", newSocket.id);
         newSocket.emit("general", `Hello from ${newSocket.id}!`);
@@ -38,7 +36,7 @@ export default function Chat() {
         socket.disconnect();
       }
     };
-  }, [socket]);
+  }, []);
 
   return (
     <AuthGuard>
