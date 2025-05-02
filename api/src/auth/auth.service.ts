@@ -8,8 +8,8 @@ import { User } from '@prisma/client';
 import { BcryptService } from '../bcrypt/bcrypt.service';
 import { PrismaService } from '../prisma/prisma.service';
 import {
-  JwtPayload,
-  JwtResponse,
+  JwtPayloadDto,
+  JwtResponseDto,
   LoginUserDto,
   RegisterUserDto,
 } from './auth.dto';
@@ -24,14 +24,14 @@ export class AuthService {
   private async generateBearerToken({
     identifier,
     email,
-  }: User): Promise<JwtResponse> {
-    const payload: JwtPayload = { sub: identifier, email };
+  }: User): Promise<JwtResponseDto> {
+    const payload: JwtPayloadDto = { sub: identifier, email };
     return {
       accessToken: await this.jwtService.signAsync(payload),
     };
   }
 
-  async register(data: RegisterUserDto): Promise<JwtResponse> {
+  async register(data: RegisterUserDto): Promise<JwtResponseDto> {
     const { email, plainPassword } = data;
 
     let user;
@@ -51,10 +51,10 @@ export class AuthService {
     return jwtResponse;
   }
 
-  async login(data: LoginUserDto): Promise<JwtResponse> {
+  async login(data: LoginUserDto): Promise<JwtResponseDto> {
     const { email, plainPassword } = data;
 
-    const user = await this.findFirst(email);
+    const user = await this.findUnique(email);
     if (!user) {
       throw new UnauthorizedException();
     }
@@ -70,7 +70,7 @@ export class AuthService {
     return jwtResponse;
   }
 
-  async findFirst(email: string): Promise<User | null> {
+  async findUnique(email: string): Promise<User | null> {
     return this.prismaService.user.findUnique({ where: { email } });
   }
 }

@@ -34,7 +34,7 @@ export class LoginUserDto implements Partial<User> {
   plainPassword: string;
 }
 
-export class JwtPayload {
+export class JwtPayloadDto {
   @IsUUID()
   sub: string;
 
@@ -42,7 +42,7 @@ export class JwtPayload {
   email: string;
 }
 
-export class JwtResponse {
+export class JwtResponseDto {
   @ApiProperty({
     description: 'The bearer token of the user',
     example:
