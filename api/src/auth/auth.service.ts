@@ -1,32 +1,43 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { User } from '@prisma/client';
 import { BcryptService } from '../bcrypt/bcrypt.service';
 import { PrismaService } from '../prisma/prisma.service';
-import {
-  LoginUserDto,
-  RegisterUserDto,
-  RegisterUserResponseDto,
-} from './auth.dto';
-import { User } from '@prisma/client';
+import { JwtResponse, LoginUserDto, RegisterUserDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private bcryptService: BcryptService,
     private prismaService: PrismaService,
+    private jwtService: JwtService,
   ) {}
+  private async generateBearerToken({
+    identifier,
+    email,
+  }: User): Promise<JwtResponse> {
+    const payload = { sub: identifier, email };
+    return {
+      accessToken: await this.jwtService.signAsync(payload),
+    };
+  }
 
-  async register(data: RegisterUserDto): Promise<RegisterUserResponseDto> {
+  async register(data: RegisterUserDto): Promise<JwtResponse> {
     const { email, plainPassword } = data;
 
-    return this.prismaService.user.create({
+    const user = await this.prismaService.user.create({
       data: {
         email,
         hashedPassword: await this.bcryptService.hashPassword(plainPassword),
       },
     });
+
+    const jwtResponse = await this.generateBearerToken(user);
+
+    return jwtResponse;
   }
 
-  async login(data: LoginUserDto): Promise<any> {
+  async login(data: LoginUserDto): Promise<JwtResponse> {
     const { email, plainPassword } = data;
 
     const user = await this.findFirst(email);
@@ -40,12 +51,9 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const { hashedPassword, ...result } = user;
+    const jwtResponse = await this.generateBearerToken(user);
 
-    // TODO: Generate a JWT and return it here
-    // instead of the user object
-
-    return result;
+    return jwtResponse;
   }
 
   async findFirst(email: string): Promise<User | null> {

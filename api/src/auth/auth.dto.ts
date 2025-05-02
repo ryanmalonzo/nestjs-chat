@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Prisma, User } from '@prisma/client';
-import { IsEmail, IsString, IsUUID } from 'class-validator';
+import { IsEmail, IsString } from 'class-validator';
 
 export class RegisterUserDto implements Partial<Prisma.UserCreateInput> {
   @ApiProperty({
@@ -18,22 +18,6 @@ export class RegisterUserDto implements Partial<Prisma.UserCreateInput> {
   plainPassword: string;
 }
 
-export class RegisterUserResponseDto implements Partial<RegisterUserDto> {
-  @ApiProperty({
-    description: 'The identifier (UUID) of the user',
-    example: '69a55e21-8851-4393-b937-9d207bbe3003',
-  })
-  @IsUUID()
-  identifier: string;
-
-  @ApiProperty({
-    description: 'The email address of the user',
-    example: 'john.doe@example.com',
-  })
-  @IsString()
-  email: string;
-}
-
 export class LoginUserDto implements Partial<User> {
   @ApiProperty({
     description: 'The email address of the user',
@@ -48,4 +32,14 @@ export class LoginUserDto implements Partial<User> {
   })
   @IsString()
   plainPassword: string;
+}
+
+export class JwtResponse {
+  @ApiProperty({
+    description: 'The bearer token of the user',
+    example:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiMTM5N2JiZS1mMTcxLTRhNWUtYmI0Yi1lZWFiYjhjMjc5YmQiLCJlbWFpbCI6ImpvaG4uZG9lQGV4YW1wbGUuY29tIiwiaWF0IjoxNzQ2MTgyNTk1LCJleHAiOjE3NDYyNjg5OTV9.InicOMknB7yzl1FvI4S6ffhnrrVo5ZX0wYuI4098i9M',
+  })
+  @IsString()
+  accessToken: string;
 }

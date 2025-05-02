@@ -1,10 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import {
-  LoginUserDto,
-  RegisterUserDto,
-  RegisterUserResponseDto,
-} from './auth.dto';
+import { JwtResponse, LoginUserDto, RegisterUserDto } from './auth.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('auth')
@@ -19,10 +15,10 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'The user has been registered successfully',
-    type: RegisterUserResponseDto,
+    type: JwtResponse,
   })
   @Post('/register')
-  register(@Body() data: RegisterUserDto): Promise<RegisterUserResponseDto> {
+  register(@Body() data: RegisterUserDto): Promise<JwtResponse> {
     return this.authService.register(data);
   }
 
@@ -33,10 +29,11 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Logged in successfully as the user',
+    type: JwtResponse,
   })
   @HttpCode(HttpStatus.OK)
   @Post('/login')
-  login(@Body() data: LoginUserDto) {
+  login(@Body() data: LoginUserDto): Promise<JwtResponse> {
     return this.authService.login(data);
   }
 }
