@@ -1,9 +1,12 @@
+"use client";
+
+import { RegisterUserDto } from "@/lib/types";
 import { AuthForm } from "./auth-form";
 
 export function RegisterForm({
   onSubmit,
 }: {
-  onSubmit?: (formData: FormData) => Promise<void>;
+  onSubmit?: ({ email, plainPassword }: RegisterUserDto) => Promise<void>;
 }) {
   return (
     <AuthForm
@@ -22,4 +25,3 @@ export function RegisterForm({
     />
   );
 }
-

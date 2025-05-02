@@ -1,9 +1,10 @@
+import { LoginUserDto } from "@/lib/types";
 import { AuthForm } from "./auth-form";
 
 export function LoginForm({
   onSubmit,
 }: {
-  onSubmit?: (formData: FormData) => Promise<void>;
+  onSubmit?: ({ email, plainPassword }: LoginUserDto) => Promise<void>
 }) {
   return (
     <AuthForm

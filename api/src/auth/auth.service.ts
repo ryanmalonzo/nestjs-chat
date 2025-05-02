@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { BcryptService } from '../bcrypt/bcrypt.service';
@@ -30,12 +34,17 @@ export class AuthService {
   async register(data: RegisterUserDto): Promise<JwtResponse> {
     const { email, plainPassword } = data;
 
-    const user = await this.prismaService.user.create({
-      data: {
-        email,
-        hashedPassword: await this.bcryptService.hashPassword(plainPassword),
-      },
-    });
+    let user;
+    try {
+      user = await this.prismaService.user.create({
+        data: {
+          email,
+          hashedPassword: await this.bcryptService.hashPassword(plainPassword),
+        },
+      });
+    } catch {
+      throw new BadRequestException();
+    }
 
     const jwtResponse = await this.generateBearerToken(user);
 

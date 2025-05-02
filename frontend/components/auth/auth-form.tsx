@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,13 +12,14 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { LoginUserDto, RegisterUserDto } from "@/lib/types";
 
 interface AuthFormProps {
   title: string;
   description: string;
   submitText: string;
   footer?: React.ReactNode;
-  onSubmit?: (formData: FormData) => Promise<void>;
+  onSubmit?: ({ email, plainPassword }: RegisterUserDto | LoginUserDto) => Promise<void>;
 }
 
 export function AuthForm({
@@ -25,6 +29,9 @@ export function AuthForm({
   footer,
   onSubmit,
 }: AuthFormProps) {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+
   return (
     <div className={cn("flex flex-col gap-6")}>
       <Card>
@@ -35,7 +42,12 @@ export function AuthForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={onSubmit}>
+          <form onSubmit={(event) => {
+            event.preventDefault();
+            if (onSubmit) {
+              onSubmit({ email, plainPassword: password })
+            }
+          }}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Adresse mail</Label>
@@ -44,6 +56,8 @@ export function AuthForm({
                   name="email"
                   type="email"
                   placeholder="john.doe@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
@@ -51,7 +65,7 @@ export function AuthForm({
                 <div className="flex items-center">
                   <Label htmlFor="password">Mot de passe</Label>
                 </div>
-                <Input id="password" name="password" type="password" placeholder="****************" required />
+                <Input id="password" name="password" type="password" placeholder="****************" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
               <Button type="submit" className="w-full">
                 {submitText}
