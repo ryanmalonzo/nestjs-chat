@@ -15,7 +15,11 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);
 
-  app.enableCors({ origin: '*' });
+  app.enableCors({
+    credentials: true,
+    origin: ['http://localhost:5173'],
+    methods: ['GET', 'POST'],
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({

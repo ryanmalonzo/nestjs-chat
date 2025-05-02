@@ -11,7 +11,15 @@ import { Server, Socket } from 'socket.io';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SocketWithUserDto } from './chat.dto';
 
-@WebSocketGateway(Number(process.env.PORT) ?? 3000, { cors: { origin: '*' } })
+@WebSocketGateway({
+  allowUpgrades: false,
+  cors: {
+    allowedHeaders: 'authorization',
+    credentials: true,
+    origin: ['http://localhost:5173'],
+    methods: ['GET', 'POST'],
+  },
+})
 export class ChatGateway implements OnGatewayConnection {
   @WebSocketServer() server: Server;
 
@@ -20,7 +28,7 @@ export class ChatGateway implements OnGatewayConnection {
   }
 
   @UseGuards(AuthGuard)
-  @SubscribeMessage('message')
+  @SubscribeMessage('general')
   handleMessage(
     @MessageBody() message: string,
     @ConnectedSocket() client: SocketWithUserDto,
