@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { Logger, UnauthorizedException, UseGuards } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -10,6 +10,8 @@ import {
 import { Server, Socket } from 'socket.io';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SocketWithUserDto } from './chat.dto';
+import { MessagesService } from 'src/messages/messages.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @WebSocketGateway({
   allowUpgrades: false,
@@ -19,20 +21,40 @@ import { SocketWithUserDto } from './chat.dto';
     origin: ['http://localhost:5173'],
     methods: ['GET', 'POST'],
   },
+  transports: ['polling'],
 })
 export class ChatGateway implements OnGatewayConnection {
   @WebSocketServer() server: Server;
+  private readonly logger = new Logger('ChatGatway');
+
+  constructor(
+    private readonly authService: AuthService,
+    private readonly messagesService: MessagesService,
+  ) {}
 
   handleConnection(client: Socket) {
-    console.log('Client connected', client.id);
+    this.logger.log('Client connected', client.id);
   }
 
   @UseGuards(AuthGuard)
   @SubscribeMessage('general')
-  handleMessage(
+  async handleMessage(
     @MessageBody() message: string,
     @ConnectedSocket() client: SocketWithUserDto,
-  ): void {
-    console.log(`${client.user.email}: ${message}`);
+  ) {
+    const user = await this.authService.findUnique(client.user.email);
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    this.messagesService.createMessage({
+      channel: 'general',
+      content: message,
+      fromUser: {
+        connect: user,
+      },
+    });
+    this.logger.log(`${client.user.email}: ${message}`);
   }
 }

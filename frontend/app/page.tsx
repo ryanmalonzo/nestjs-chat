@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import AuthGuard from "@/components/auth/auth-guard";
 import {
@@ -13,22 +13,25 @@ import {
 
 export default function Chat() {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const socketInitialized = useRef(false);
 
   useEffect(() => {
-    if (!socket) {
+    if (!socketInitialized.current) {
       const newSocket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
         extraHeaders: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
+        transports: ["polling"],
         withCredentials: true,
       });
 
       newSocket.on("connect", () => {
-        console.log("Connected to socket server with ID:", newSocket.id);
+        console.log("Socket connected");
         newSocket.emit("general", `Hello from ${newSocket.id}!`);
       });
 
       setSocket(newSocket);
+      socketInitialized.current = true;
     }
 
     return () => {
