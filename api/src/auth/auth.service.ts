@@ -17,9 +17,9 @@ import {
 @Injectable()
 export class AuthService {
   constructor(
-    private bcryptService: BcryptService,
-    private prismaService: PrismaService,
-    private jwtService: JwtService,
+    private readonly bcryptService: BcryptService,
+    private readonly prismaService: PrismaService,
+    private readonly jwtService: JwtService,
   ) {}
   private async generateBearerToken({
     identifier,

@@ -14,7 +14,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class UsersService {
   constructor(
     @Inject(REQUEST) private readonly request: Request,
-    private prismaService: PrismaService,
+    private readonly prismaService: PrismaService,
   ) {}
 
   async me(): Promise<PartialUserDto> {
