@@ -10,6 +10,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   const checkIfUserIsAuthenticated = async () => {
     const accessToken = localStorage.getItem("accessToken");
+
+    if (!accessToken) {
+      router.push("/login");
+      return;
+    }
+
     const response = await api.get("users/me", {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -17,9 +23,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     });
 
     if (!response.ok) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("email");
       router.push("/login");
-    } else if (pathname === "/login" || pathname === "/register") {
-      router.push("/chat");
     }
   };
 

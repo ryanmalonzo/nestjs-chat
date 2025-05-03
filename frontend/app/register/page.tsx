@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { RegisterForm } from "@/components/auth/register-form";
 import { api } from "@/lib/api";
 import { JwtResponse, RegisterUserDto } from "@/lib/types";
-import AuthGuard from "@/components/auth/auth-guard";
 
 export default function Register() {
   const router = useRouter();
@@ -31,12 +30,10 @@ export default function Register() {
   };
 
   return (
-    <AuthGuard>
-      <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-        <div className="w-full max-w-sm">
-          <RegisterForm onSubmit={handleSubmit} />
-        </div>
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <RegisterForm onSubmit={handleSubmit} />
       </div>
-    </AuthGuard>
+    </div>
   );
 }
