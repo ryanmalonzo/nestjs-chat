@@ -8,7 +8,7 @@ interface ChatBubbleProps {
 
 export default function ChatBubble({ userEmail, message }: ChatBubbleProps) {
   const isOwnMessage = userEmail === message.fromUser.email;
-  const extraBubbleClasses = isOwnMessage ? "self-end" : "bg-muted";
+  const extraBubbleClasses = isOwnMessage ? "self-end" : "self-start bg-muted";
   const extraMetadataClasses = isOwnMessage ? "self-end ml-0 mr-2" : "";
 
   const formatDateString = (dateString: string) => {
@@ -27,15 +27,15 @@ export default function ChatBubble({ userEmail, message }: ChatBubbleProps) {
       <p
         className={cn(
           "text-xs text-gray-500 mb-1 ml-2 font-medium",
-          extraMetadataClasses
+          extraMetadataClasses,
         )}
       >
         {isOwnMessage ? "Moi" : message.fromUser.email}
       </p>
       <div
         className={cn(
-          "flex lg:w-max lg:max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm bg-primary text-primary-foreground",
-          extraBubbleClasses
+          "flex lg:max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm bg-primary text-primary-foreground",
+          extraBubbleClasses,
         )}
       >
         {message.content}
