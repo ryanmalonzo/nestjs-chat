@@ -48,7 +48,7 @@ export class ChatGateway implements OnGatewayConnection {
       throw new UnauthorizedException();
     }
 
-    this.messagesService.createMessage({
+    await this.messagesService.createMessage({
       channel: 'general',
       content: message,
       fromUser: {
