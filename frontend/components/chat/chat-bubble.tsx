@@ -25,14 +25,17 @@ export default function ChatBubble({ userEmail, message }: ChatBubbleProps) {
   return (
     <div className="flex flex-col gap-1">
       <p
-        className={cn("text-xs text-gray-500 mb-1 ml-2", extraMetadataClasses)}
+        className={cn(
+          "text-xs text-gray-500 mb-1 ml-2 font-medium",
+          extraMetadataClasses
+        )}
       >
         {isOwnMessage ? "Moi" : message.fromUser.email}
       </p>
       <div
         className={cn(
           "flex lg:w-max lg:max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm bg-primary text-primary-foreground",
-          extraBubbleClasses,
+          extraBubbleClasses
         )}
       >
         {message.content}
