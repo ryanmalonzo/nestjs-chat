@@ -21,11 +21,12 @@ export class UsersController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'The information of the current user',
+    type: PartialUserDto,
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Get('/me')
-  me(): Promise<PartialUserDto> {
+  async me(): Promise<PartialUserDto> {
     return this.usersService.me();
   }
 }
