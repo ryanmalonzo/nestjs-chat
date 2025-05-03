@@ -8,9 +8,20 @@ datasource db {
 }
 
 model User {
-  identifier     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email          String   @unique
+  identifier     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email          String    @unique
   hashedPassword String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now()) @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
+  Message        Message[]
+}
+
+model Message {
+  identifier         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fromUser           User     @relation(fields: [fromUserIdentifier], references: [identifier])
+  fromUserIdentifier String   @db.Uuid
+  channel            String
+  content            String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
 }
