@@ -3,8 +3,23 @@ export interface RegisterUserDto {
   plainPassword: string;
 }
 
-export interface LoginUserDto extends RegisterUserDto { }
+export interface LoginUserDto extends RegisterUserDto {}
 
 export interface JwtResponse {
   accessToken: string;
+}
+
+export interface MessageResponse {
+  identifier: string;
+  fromUserIdentifier: string;
+  channel: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  fromUser: {
+    identifier: string;
+    email: string;
+    createdAt: string;
+    updatedAt: string;
+  };
 }
