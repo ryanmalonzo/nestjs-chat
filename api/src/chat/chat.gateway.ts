@@ -42,7 +42,7 @@ export class ChatGateway implements OnGatewayConnection {
     @MessageBody() message: string,
     @ConnectedSocket() client: SocketWithUserDto,
   ) {
-    const user = await this.authService.findUnique(client.user.email);
+    const user = await this.authService.findUserByEmail(client.user.email);
 
     if (!user) {
       throw new UnauthorizedException();

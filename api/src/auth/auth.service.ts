@@ -54,7 +54,7 @@ export class AuthService {
   async login(data: LoginUserDto): Promise<JwtResponseDto> {
     const { email, plainPassword } = data;
 
-    const user = await this.findUnique(email);
+    const user = await this.findUserByEmail(email);
     if (!user) {
       throw new UnauthorizedException();
     }
@@ -70,7 +70,7 @@ export class AuthService {
     return jwtResponse;
   }
 
-  async findUnique(email: string): Promise<User | null> {
+  async findUserByEmail(email: string): Promise<User | null> {
     return this.prismaService.user.findUnique({ where: { email } });
   }
 }
