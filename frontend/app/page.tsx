@@ -25,7 +25,21 @@ export default function Chat() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
 
+  const scrollAreaRef = useRef(null);
+
   const socketInitialized = useRef(false);
+
+  const scrollToBottom = (container: HTMLElement | null, smooth = false) => {
+    if (container?.children.length) {
+      const lastElement = container?.lastChild as HTMLElement;
+
+      lastElement?.scrollIntoView({
+        behavior: smooth ? "smooth" : "auto",
+        block: "end",
+        inline: "nearest",
+      });
+    }
+  };
 
   // Get email and access token
   useEffect(() => {
@@ -93,6 +107,11 @@ export default function Chat() {
     }
   }, [accessToken]);
 
+  // Automatically scroll to bottom with new messages
+  useEffect(() => {
+    scrollToBottom(scrollAreaRef.current);
+  }, [messages]);
+
   return (
     <AuthGuard>
       <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -107,7 +126,7 @@ export default function Chat() {
               </CardHeader>
               <CardContent>
                 <ScrollArea type="auto" className="h-[70svh] lg:px-5">
-                  <div className="space-y-5">
+                  <div className="space-y-5" ref={scrollAreaRef}>
                     {messages.length > 0 &&
                       messages.map((message) => (
                         <ChatBubble
