@@ -26,14 +26,13 @@ export class UsersService {
 
     const user = await this.prismaService.user.findUnique({
       where: { identifier },
+      omit: { hashedPassword: true },
     });
 
     if (!user) {
       throw new UnauthorizedException();
     }
 
-    const { email } = user;
-
-    return { identifier, email };
+    return user;
   }
 }
