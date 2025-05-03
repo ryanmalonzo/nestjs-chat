@@ -60,7 +60,9 @@ export function AuthForm({
                   type="email"
                   placeholder="john.doe@example.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                  }}
                   required
                 />
               </div>
@@ -74,7 +76,9 @@ export function AuthForm({
                   type="password"
                   placeholder="****************"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}
                   required
                 />
               </div>

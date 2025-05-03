@@ -1,8 +1,17 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useOptimistic,
+  startTransition,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
+import { v4 as uuidv4 } from "uuid";
 import AuthGuard from "@/components/auth/auth-guard";
 import {
   Card,
@@ -15,6 +24,8 @@ import { api } from "@/lib/api";
 import { MessageResponse } from "@/lib/types";
 import ChatBubble from "@/components/chat/chat-bubble";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function Chat() {
   const router = useRouter();
@@ -25,21 +36,7 @@ export default function Chat() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
 
-  const scrollAreaRef = useRef(null);
-
   const socketInitialized = useRef(false);
-
-  const scrollToBottom = (container: HTMLElement | null, smooth = false) => {
-    if (container?.children.length) {
-      const lastElement = container?.lastChild as HTMLElement;
-
-      lastElement?.scrollIntoView({
-        behavior: smooth ? "smooth" : "auto",
-        block: "end",
-        inline: "nearest",
-      });
-    }
-  };
 
   // Get email and access token
   useEffect(() => {
@@ -72,6 +69,12 @@ export default function Chat() {
         console.log("Socket connected");
       });
 
+      newSocket.on("general", (newMessage: MessageResponse) => {
+        // Handled by the child ChatArea component
+        if (newMessage.fromUser.email === email) return;
+        setMessages((previousMessages) => [...previousMessages, newMessage]);
+      });
+
       setSocket(newSocket);
       socketInitialized.current = true;
     }
@@ -93,7 +96,7 @@ export default function Chat() {
       });
 
       if (!response.ok) {
-        console.log("Failed loading messages");
+        console.log("Failed to load messages");
         return;
       }
 
@@ -106,11 +109,6 @@ export default function Chat() {
       fetchMessages();
     }
   }, [accessToken]);
-
-  // Automatically scroll to bottom with new messages
-  useEffect(() => {
-    scrollToBottom(scrollAreaRef.current);
-  }, [messages]);
 
   return (
     <AuthGuard>
@@ -125,23 +123,129 @@ export default function Chat() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ScrollArea type="auto" className="h-[70svh] lg:px-5">
-                  <div className="space-y-5" ref={scrollAreaRef}>
-                    {messages.length > 0 &&
-                      messages.map((message) => (
-                        <ChatBubble
-                          key={message.identifier}
-                          userEmail={email}
-                          message={message}
-                        />
-                      ))}
-                  </div>
-                </ScrollArea>
+                <ChatArea
+                  messages={messages}
+                  setMessages={setMessages}
+                  email={email}
+                  socket={socket}
+                />
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
     </AuthGuard>
+  );
+}
+
+interface ChatAreaProps {
+  messages: MessageResponse[];
+  setMessages: Dispatch<SetStateAction<MessageResponse[]>>;
+  email: string;
+  socket: Socket | null;
+}
+
+function ChatArea({ messages, setMessages, email, socket }: ChatAreaProps) {
+  const [messageInput, setMessageInput] = useState("");
+
+  const scrollAreaRef = useRef(null);
+
+  const scrollToBottom = (container: HTMLElement | null, smooth = false) => {
+    if (container?.children.length) {
+      const lastElement = container?.lastChild as HTMLElement;
+
+      lastElement?.scrollIntoView({
+        behavior: smooth ? "smooth" : "auto",
+        block: "end",
+        inline: "nearest",
+      });
+    }
+  };
+
+  // Automatically scroll to bottom with new messages
+  useEffect(() => {
+    scrollToBottom(scrollAreaRef.current);
+  }, [messages]);
+
+  const sendMessage = async (event: React.SyntheticEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    startTransition(() => {
+      addOptimisticMessage(messageInput);
+    });
+
+    // Reset form
+    setMessageInput("");
+
+    startTransition(() => {
+      if (socket) {
+        socket.emit(
+          "general",
+          messageInput,
+          (messageOutput: MessageResponse) => {
+            startTransition(() => {
+              setMessages((previousMessages) => [
+                ...previousMessages,
+                messageOutput,
+              ]);
+            });
+          },
+        );
+      }
+    });
+  };
+
+  const [optimisticMessages, addOptimisticMessage] = useOptimistic(
+    messages,
+    (state, newMessage) => [
+      {
+        identifier: uuidv4(),
+        fromUserIdentifier: uuidv4(),
+        channel: "general",
+        content: newMessage as string,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        fromUser: {
+          identifier: uuidv4(),
+          email,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      },
+      ...state,
+    ],
+  );
+
+  return (
+    <>
+      <ScrollArea type="auto" className="h-[70svh] lg:px-5">
+        <div className="space-y-5" ref={scrollAreaRef}>
+          {optimisticMessages.length > 0 &&
+            optimisticMessages.map((message) => (
+              <ChatBubble
+                key={message.identifier}
+                userEmail={email}
+                message={message}
+              />
+            ))}
+        </div>
+      </ScrollArea>
+      {/* Input Area */}
+      <form className="flex flex-1 gap-3 mt-5" onSubmit={sendMessage}>
+        <Input
+          id="message"
+          name="message"
+          placeholder="Taper votre message ici..."
+          className="py-5"
+          value={messageInput}
+          onChange={(event) => {
+            setMessageInput(event.target.value);
+          }}
+        />
+        <Button type="submit" variant="outline" size="lg" className="py-5">
+          Envoyer
+        </Button>
+      </form>
+    </>
   );
 }

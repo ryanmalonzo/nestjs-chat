@@ -24,6 +24,11 @@ export class MessagesService {
   async createMessage(data: Prisma.MessageCreateInput): Promise<Message> {
     return await this.prismaService.message.create({
       data,
+      include: {
+        fromUser: {
+          omit: { hashedPassword: true },
+        },
+      },
     });
   }
 }

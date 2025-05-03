@@ -7,10 +7,9 @@ interface ChatBubbleProps {
 }
 
 export default function ChatBubble({ userEmail, message }: ChatBubbleProps) {
-  const extraBubbleClasses =
-    userEmail === message.fromUser.email ? "self-end" : "bg-muted";
-  const extraTimestampClasses =
-    userEmail === message.fromUser.email ? "self-end" : "";
+  const isOwnMessage = userEmail === message.fromUser.email;
+  const extraBubbleClasses = isOwnMessage ? "self-end" : "bg-muted";
+  const extraMetadataClasses = isOwnMessage ? "self-end ml-0 mr-2" : "";
 
   const formatDateString = (dateString: string) => {
     const toDate = new Date(dateString);
@@ -25,6 +24,11 @@ export default function ChatBubble({ userEmail, message }: ChatBubbleProps) {
 
   return (
     <div className="flex flex-col gap-1">
+      <p
+        className={cn("text-xs text-gray-500 mb-1 ml-2", extraMetadataClasses)}
+      >
+        {isOwnMessage ? "Moi" : message.fromUser.email}
+      </p>
       <div
         className={cn(
           "flex lg:w-max lg:max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm bg-primary text-primary-foreground",
@@ -33,7 +37,7 @@ export default function ChatBubble({ userEmail, message }: ChatBubbleProps) {
       >
         {message.content}
       </div>
-      <p className={cn("text-xs text-gray-500", extraTimestampClasses)}>
+      <p className={cn("text-xs text-gray-500 ml-2", extraMetadataClasses)}>
         {formatDateString(message.createdAt)}
       </p>
     </div>

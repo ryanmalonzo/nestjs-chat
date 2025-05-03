@@ -39,7 +39,7 @@ export class ChatGateway implements OnGatewayConnection {
   @UseGuards(AuthGuard)
   @SubscribeMessage('general')
   async handleMessage(
-    @MessageBody() message: string,
+    @MessageBody() content: string,
     @ConnectedSocket() client: SocketWithUserDto,
   ) {
     const user = await this.authService.findUserByEmail(client.user.email);
@@ -48,13 +48,17 @@ export class ChatGateway implements OnGatewayConnection {
       throw new UnauthorizedException();
     }
 
-    await this.messagesService.createMessage({
+    const createdMessage = await this.messagesService.createMessage({
       channel: 'general',
-      content: message,
+      content: content,
       fromUser: {
         connect: user,
       },
     });
-    this.logger.log(`${client.user.email}: ${message}`);
+    this.server.emit('general', createdMessage);
+
+    this.logger.log(`${client.user.email}: ${content}`);
+
+    return createdMessage;
   }
 }
