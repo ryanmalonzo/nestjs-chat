@@ -27,6 +27,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LogOutIcon } from "lucide-react";
+import { AvatarMenu } from "@/components/avatar-menu";
 
 export default function Chat() {
   const router = useRouter();
@@ -118,19 +119,9 @@ export default function Chat() {
           <div className="flex flex-col gap-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex justify-between">
+                <CardTitle className="flex items-center justify-between">
                   <h1 className="text-2xl">Chat</h1>
-                  <Button
-                    variant="ghost"
-                    className="rounded-full py-2 px-2.5 cursor-pointer"
-                    onClick={() => {
-                      localStorage.removeItem("email");
-                      localStorage.removeItem("accessToken");
-                      router.push("/login");
-                    }}
-                  >
-                    <LogOutIcon className="w-5 h-5" />
-                  </Button>
+                  <AvatarMenu email={email} username={email} />
                 </CardTitle>
                 <CardDescription>
                   Bienvenue dans <strong>#general</strong> !
