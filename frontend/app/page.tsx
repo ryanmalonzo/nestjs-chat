@@ -170,6 +170,10 @@ function ChatArea({ messages, setMessages, email, socket }: ChatAreaProps) {
   const sendMessage = async (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!messageInput) {
+      return;
+    }
+
     startTransition(() => {
       addOptimisticMessage(messageInput);
     });
