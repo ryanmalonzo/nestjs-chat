@@ -68,7 +68,8 @@ pnpm run dev # or npm run dev
 - [x] Logout Button
 - [ ] Usernames
 - [ ] Avatars
+- [ ] User Profiles
 - [ ] Multiple Channels
 - [ ] Dynamic Channel Creation
-- [ ] Image Support
-- [ ] Emoji Reaction Support
+- [ ] Image Support
+- [ ] Emoji Reaction Support
