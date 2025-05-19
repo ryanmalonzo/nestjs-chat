@@ -25,7 +25,7 @@ import { AuthService } from 'src/auth/auth.service';
 })
 export class ChatGateway implements OnGatewayConnection {
   @WebSocketServer() server: Server;
-  private readonly logger = new Logger('ChatGatway');
+  private readonly logger = new Logger('ChatGateway');
 
   constructor(
     private readonly authService: AuthService,
