@@ -242,7 +242,7 @@ function ChatArea({ messages, setMessages, email, socket }: ChatAreaProps) {
             setMessageInput(event.target.value);
           }}
         />
-        <Button type="submit" variant="outline" size="lg" className="py-5">
+        <Button type="submit" variant="outline" size="lg" className="py-5 cursor-pointer">
           Envoyer
         </Button>
       </form>
