@@ -65,7 +65,7 @@ pnpm run dev # or npm run dev
 
 ## Improvements
 
-- [ ] Logout Button
+- [x] Logout Button
 - [ ] Usernames
 - [ ] Avatars
 - [ ] Multiple Channels
