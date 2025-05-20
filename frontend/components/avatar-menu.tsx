@@ -1,9 +1,4 @@
-import {
-  CircleUserRoundIcon,
-  LogOutIcon,
-  UserPenIcon,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,28 +7,35 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useRouter } from "next/navigation"
-import { AvatarWithFallback } from "./avatar-with-fallback"
+} from "@/components/ui/dropdown-menu";
+import { CircleUserRoundIcon, LogOutIcon, UserPenIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { AvatarWithFallback } from "./avatar-with-fallback";
+import { ProfileDialog } from "./profile-dialog";
 
 interface AvatarMenuProps {
-  username: string
-  email: string
+  username: string;
+  email: string;
 }
 
 export function AvatarMenu({ username, email }: AvatarMenuProps) {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("email")
-    localStorage.removeItem("accessToken")
-    router.push("/login")
-  }
+    localStorage.removeItem("email");
+    localStorage.removeItem("accessToken");
+    router.push("/login");
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="icon" variant="outline" aria-label="Open account menu" className="cursor-pointer">
+        <Button
+          size="icon"
+          variant="outline"
+          aria-label="Open account menu"
+          className="cursor-pointer"
+        >
           <CircleUserRoundIcon size={16} aria-hidden="true" />
         </Button>
       </DropdownMenuTrigger>
@@ -51,10 +53,21 @@ export function AvatarMenu({ username, email }: AvatarMenuProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer">
-            <UserPenIcon size={16} className="opacity-60" aria-hidden="true" />
-            <span>Modifier mon profil</span>
-          </DropdownMenuItem>
+          <ProfileDialog>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onSelect={(event) => {
+                event.preventDefault();
+              }}
+            >
+              <UserPenIcon
+                size={16}
+                className="opacity-60"
+                aria-hidden="true"
+              />
+              <span>Modifier mon profil</span>
+            </DropdownMenuItem>
+          </ProfileDialog>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
@@ -63,5 +76,5 @@ export function AvatarMenu({ username, email }: AvatarMenuProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
