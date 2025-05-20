@@ -12,13 +12,9 @@ import { CircleUserRoundIcon, LogOutIcon, UserPenIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AvatarWithFallback } from "./avatar-with-fallback";
 import { ProfileDialog } from "./profile-dialog";
+import { UserResponse } from "@/lib/types";
 
-interface AvatarMenuProps {
-  username: string;
-  email: string;
-}
-
-export function AvatarMenu({ username, email }: AvatarMenuProps) {
+export function AvatarMenu({ user }: { user: UserResponse }) {
   const router = useRouter();
 
   const handleLogout = () => {
@@ -43,16 +39,16 @@ export function AvatarMenu({ username, email }: AvatarMenuProps) {
           <AvatarWithFallback />
           <div className="flex min-w-0 flex-col">
             <span className="text-foreground truncate text-sm font-medium">
-              {username}
+              {user.username}
             </span>
             <span className="text-muted-foreground truncate text-xs font-normal">
-              {email}
+              {user.email}
             </span>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <ProfileDialog>
+          <ProfileDialog user={user}>
             <DropdownMenuItem
               className="cursor-pointer"
               onSelect={(event) => {

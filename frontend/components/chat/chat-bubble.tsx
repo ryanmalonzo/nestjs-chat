@@ -2,12 +2,15 @@ import { MessageResponse } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface ChatBubbleProps {
-  userEmail: string;
+  userIdentifier: string;
   message: MessageResponse;
 }
 
-export default function ChatBubble({ userEmail, message }: ChatBubbleProps) {
-  const isOwnMessage = userEmail === message.fromUser.email;
+export default function ChatBubble({
+  userIdentifier,
+  message,
+}: ChatBubbleProps) {
+  const isOwnMessage = userIdentifier === message.fromUser.identifier;
   const extraBubbleClasses = isOwnMessage ? "self-end" : "self-start bg-muted";
   const extraMetadataClasses = isOwnMessage ? "self-end ml-0 mr-2" : "";
 
@@ -30,7 +33,7 @@ export default function ChatBubble({ userEmail, message }: ChatBubbleProps) {
           extraMetadataClasses,
         )}
       >
-        {isOwnMessage ? "Moi" : message.fromUser.email}
+        {isOwnMessage ? "Moi" : message.fromUser.username}
       </p>
       <div
         className={cn(

@@ -1,4 +1,11 @@
-import { Controller, HttpStatus, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  HttpStatus,
+  Get,
+  UseGuards,
+  Patch,
+  Body,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
   ApiBearerAuth,
@@ -15,12 +22,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @ApiOperation({
-    summary: 'Get information about the current user',
-    description: 'Get information about the current user',
+    summary: 'Get the current user',
+    description: 'Get the current user',
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'The information of the current user',
+    description: 'The current user',
     type: PartialUserDto,
   })
   @ApiBearerAuth()
@@ -28,5 +35,21 @@ export class UsersController {
   @Get('/me')
   async me(): Promise<PartialUserDto> {
     return this.usersService.me();
+  }
+
+  @ApiOperation({
+    summary: 'Update the current user',
+    description: 'Update the current user',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'The updated user',
+    type: PartialUserDto,
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Patch('/me')
+  async updateUser(@Body() data: PartialUserDto): Promise<PartialUserDto> {
+    return this.usersService.updateUser(data);
   }
 }

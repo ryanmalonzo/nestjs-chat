@@ -66,9 +66,9 @@ pnpm run dev # or npm run dev
 ## Improvements
 
 - [x] Logout Button
-- [ ] Usernames
+- [x] Usernames
 - [ ] Avatars
-- [ ] User Profiles
+- [x] User Profiles
 - [ ] Multiple Channels
 - [ ] Dynamic Channel Creation
 - [ ] Image Support

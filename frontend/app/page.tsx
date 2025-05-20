@@ -128,7 +128,7 @@ export default function Chat() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <h1 className="text-2xl">Chat</h1>
-                  <AvatarMenu email={user.email} username={user.username} />
+                  <AvatarMenu user={user} />
                 </CardTitle>
                 <CardDescription>
                   Bienvenue dans <strong>#general</strong> !
@@ -138,7 +138,7 @@ export default function Chat() {
                 <ChatArea
                   messages={messages}
                   setMessages={setMessages}
-                  email={user.email}
+                  user={user}
                   socket={socket}
                 />
               </CardContent>
@@ -153,11 +153,11 @@ export default function Chat() {
 interface ChatAreaProps {
   messages: MessageResponse[];
   setMessages: Dispatch<SetStateAction<MessageResponse[]>>;
-  email: string;
+  user: UserResponse;
   socket: Socket | null;
 }
 
-function ChatArea({ messages, setMessages, email, socket }: ChatAreaProps) {
+function ChatArea({ messages, setMessages, user, socket }: ChatAreaProps) {
   const [messageInput, setMessageInput] = useState("");
 
   const scrollAreaRef = useRef(null);
@@ -223,7 +223,8 @@ function ChatArea({ messages, setMessages, email, socket }: ChatAreaProps) {
         updatedAt: new Date().toISOString(),
         fromUser: {
           identifier: uuidv4(),
-          email,
+          username: user.username,
+          email: user.email,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
@@ -240,7 +241,7 @@ function ChatArea({ messages, setMessages, email, socket }: ChatAreaProps) {
             optimisticMessages.map((message) => (
               <ChatBubble
                 key={message.identifier}
-                userEmail={email}
+                userIdentifier={user.identifier}
                 message={message}
               />
             ))}

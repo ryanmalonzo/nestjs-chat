@@ -26,6 +26,7 @@ export interface MessageResponse {
   updatedAt: string;
   fromUser: {
     identifier: string;
+    username: string;
     email: string;
     createdAt: string;
     updatedAt: string;

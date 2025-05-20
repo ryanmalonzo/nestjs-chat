@@ -35,4 +35,22 @@ export class UsersService {
 
     return user;
   }
+
+  async updateUser(data: PartialUserDto): Promise<PartialUserDto> {
+    if (!('user' in this.request)) {
+      throw new UnauthorizedException();
+    }
+
+    const { sub: requestUserIdentifier } = this.request.user as JwtPayloadDto;
+
+    const { identifier, createdAt, updatedAt, ...rest } = data;
+
+    const user = await this.prismaService.user.update({
+      where: { identifier: requestUserIdentifier },
+      data: rest,
+      omit: { hashedPassword: true },
+    });
+
+    return user;
+  }
 }

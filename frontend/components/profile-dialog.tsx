@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useId } from "react"
-import { CheckIcon, ImagePlusIcon } from "lucide-react"
-import { useFileUpload } from "@/hooks/use-file-upload"
-import { Button } from "@/components/ui/button"
+import { useId, useState } from "react";
+import { ImagePlusIcon } from "lucide-react";
+import { useFileUpload } from "@/hooks/use-file-upload";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -13,9 +13,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { UserResponse } from "@/lib/types";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 const initialAvatarImage = [
   {
@@ -25,16 +28,45 @@ const initialAvatarImage = [
     url: "/avatar-72-01.jpg",
     id: "avatar-123456789",
   },
-]
+];
 
-export function ProfileDialog({ children }: { children: React.ReactNode }) {
-  const id = useId()
+export function ProfileDialog({
+  user,
+  children,
+}: {
+  user: UserResponse;
+  children: React.ReactNode;
+}) {
+  const id = useId();
+
+  const [username, setUsername] = useState(user.username);
+  const [email, setEmail] = useState(user.email);
+
+  const handleSubmit = async () => {
+    const response = await api.patch("users/me", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      json: {
+        username,
+        email,
+      },
+    });
+
+    if (!response.ok) {
+      toast.error("Erreur lors de la mise à jour du profil");
+      return;
+    }
+
+    const updatedUser = await response.json();
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    toast.success("Profil mis à jour avec succès");
+  };
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="flex flex-col gap-0 overflow-y-visible p-0 sm:max-w-lg [&>button:last-child]:top-3.5">
         <DialogHeader className="contents space-y-0 text-left">
           <DialogTitle className="border-b px-6 py-4 text-base">
@@ -50,46 +82,39 @@ export function ProfileDialog({ children }: { children: React.ReactNode }) {
           <Avatar />
           <div className="px-6 pt-4 pb-6">
             <form className="space-y-4">
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <div className="flex-1 space-y-2">
-                  <Label htmlFor={`${id}-first-name`}>Prénom</Label>
-                  <Input
-                    id={`${id}-first-name`}
-                    placeholder="Matt"
-                    defaultValue="Margaret"
-                    type="text"
-                    required
-                  />
-                </div>
-                <div className="flex-1 space-y-2">
-                  <Label htmlFor={`${id}-last-name`}>Nom</Label>
-                  <Input
-                    id={`${id}-last-name`}
-                    placeholder="Welsh"
-                    defaultValue="Villard"
-                    type="text"
-                    required
-                  />
-                </div>
-              </div>
+              {/* Username */}
               <div className="*:not-first:mt-2">
                 <Label htmlFor={`${id}-username`}>Nom d&apos;utilisateur</Label>
                 <div className="relative">
                   <Input
                     id={`${id}-username`}
                     className="peer pe-9"
-                    placeholder="Username"
-                    defaultValue="margaret-villard-69"
+                    placeholder="john.doe"
+                    value={username}
+                    onChange={(event) => {
+                      setUsername(event.target.value);
+                    }}
                     type="text"
                     required
                   />
-                  <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-3 peer-disabled:opacity-50">
-                    <CheckIcon
-                      size={16}
-                      className="text-emerald-500"
-                      aria-hidden="true"
-                    />
-                  </div>
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="*:not-first:mt-2">
+                <Label htmlFor={`${id}-email`}>Adresse mail</Label>
+                <div className="relative">
+                  <Input
+                    id={`${id}-email`}
+                    className="peer pe-9"
+                    placeholder="john.doe@example.com"
+                    value={email}
+                    onChange={(event) => {
+                      setEmail(event.target.value);
+                    }}
+                    type="text"
+                    required
+                  />
                 </div>
               </div>
             </form>
@@ -102,12 +127,14 @@ export function ProfileDialog({ children }: { children: React.ReactNode }) {
             </Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button type="button">Sauvegarder</Button>
+            <Button type="button" onClick={handleSubmit}>
+              Sauvegarder
+            </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 function ProfileBanner() {
@@ -115,16 +142,16 @@ function ProfileBanner() {
     <div className="h-32">
       <div className="bg-muted relative flex size-full items-center justify-center overflow-hidden" />
     </div>
-  )
+  );
 }
 
 function Avatar() {
   const [{ files }, { openFileDialog, getInputProps }] = useFileUpload({
     accept: "image/*",
     initialFiles: initialAvatarImage,
-  })
+  });
 
-  const currentImage = files[0]?.preview || null
+  const currentImage = files[0]?.preview || null;
 
   return (
     <div className="-mt-10 px-6">
@@ -153,5 +180,5 @@ function Avatar() {
         />
       </div>
     </div>
-  )
+  );
 }
