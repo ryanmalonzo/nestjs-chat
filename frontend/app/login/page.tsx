@@ -24,7 +24,6 @@ export default function Login() {
 
     const { accessToken } = (await response.json()) as JwtResponse;
     localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("email", email);
 
     router.push("/chat");
   };

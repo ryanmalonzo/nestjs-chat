@@ -21,19 +21,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { api } from "@/lib/api";
-import { MessageResponse } from "@/lib/types";
+import { MessageResponse, UserResponse } from "@/lib/types";
 import ChatBubble from "@/components/chat/chat-bubble";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LogOutIcon } from "lucide-react";
 import { AvatarMenu } from "@/components/avatar-menu";
 
 export default function Chat() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
   const [accessToken, setAccessToken] = useState("");
+  const [user, setUser] = useState<UserResponse>({
+    email: "",
+    username: "",
+    createdAt: "",
+    updatedAt: "",
+    identifier: "",
+  });
 
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
@@ -43,16 +48,18 @@ export default function Chat() {
   // Get email and access token
   useEffect(() => {
     if (router) {
-      const localEmail = localStorage.getItem("email");
       const localAccessToken = localStorage.getItem("accessToken");
+      const localUser = localStorage.getItem("user");
 
-      if (!localEmail || !localAccessToken) {
+      if (!localUser || !localAccessToken) {
         router.push("/login");
         return;
       }
 
-      setEmail(localEmail);
+      const user = JSON.parse(localUser) as UserResponse;
+
       setAccessToken(localAccessToken);
+      setUser(user);
     }
   }, [router]);
 
@@ -73,7 +80,7 @@ export default function Chat() {
 
       newSocket.on("general", (newMessage: MessageResponse) => {
         // Handled by the child ChatArea component
-        if (newMessage.fromUser.email === email) return;
+        if (newMessage.fromUser.email === user.email) return;
         setMessages((previousMessages) => [...previousMessages, newMessage]);
       });
 
@@ -121,7 +128,7 @@ export default function Chat() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <h1 className="text-2xl">Chat</h1>
-                  <AvatarMenu email={email} username={email} />
+                  <AvatarMenu email={user.email} username={user.username} />
                 </CardTitle>
                 <CardDescription>
                   Bienvenue dans <strong>#general</strong> !
@@ -131,7 +138,7 @@ export default function Chat() {
                 <ChatArea
                   messages={messages}
                   setMessages={setMessages}
-                  email={email}
+                  email={user.email}
                   socket={socket}
                 />
               </CardContent>
@@ -251,7 +258,12 @@ function ChatArea({ messages, setMessages, email, socket }: ChatAreaProps) {
             setMessageInput(event.target.value);
           }}
         />
-        <Button type="submit" variant="outline" size="lg" className="py-5 cursor-pointer">
+        <Button
+          type="submit"
+          variant="outline"
+          size="lg"
+          className="py-5 cursor-pointer"
+        >
           Envoyer
         </Button>
       </form>

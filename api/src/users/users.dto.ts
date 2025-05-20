@@ -5,6 +5,9 @@ export class PartialUserDto implements Omit<User, 'hashedPassword'> {
   @ApiProperty({ description: 'User identifier (UUID)' })
   identifier: string;
 
+  @ApiProperty({ description: 'Username' })
+  username: string;
+
   @ApiProperty({ description: 'User email' })
   email: string;
 

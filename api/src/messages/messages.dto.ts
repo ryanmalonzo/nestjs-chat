@@ -78,6 +78,7 @@ export class MessagesResponseDto implements MessagesResponseType {
   })
   fromUser: {
     identifier: string;
+    username: string;
     email: string;
     createdAt: Date;
     updatedAt: Date;

@@ -9,6 +9,14 @@ export interface JwtResponse {
   accessToken: string;
 }
 
+export interface UserResponse {
+  identifier: string;
+  username: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface MessageResponse {
   identifier: string;
   fromUserIdentifier: string;

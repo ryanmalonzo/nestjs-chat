@@ -22,7 +22,6 @@ export function AvatarMenu({ username, email }: AvatarMenuProps) {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("email");
     localStorage.removeItem("accessToken");
     router.push("/login");
   };

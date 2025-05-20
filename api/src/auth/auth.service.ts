@@ -38,6 +38,7 @@ export class AuthService {
     try {
       user = await this.prismaService.user.create({
         data: {
+          username: email,
           email,
           hashedPassword: await this.bcryptService.hashPassword(plainPassword),
         },
