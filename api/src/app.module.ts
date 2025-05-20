@@ -6,17 +6,19 @@ import { ConfigModule } from '@nestjs/config';
 import { ChatModule } from './chat/chat.module';
 import { UsersModule } from './users/users.module';
 import { MessagesModule } from './messages/messages.module';
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
   imports: [
     AuthModule,
     BcryptModule,
     ChatModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
     ChatModule,
     UsersModule,
     MessagesModule,
+    DocumentsModule,
   ],
   controllers: [],
   providers: [],

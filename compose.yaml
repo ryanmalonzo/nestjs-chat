@@ -30,8 +30,8 @@ services:
     volumes:
       - "minio-data:/data"
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-esgi}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-esgiesgi}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
 
 volumes:
   db-data:
