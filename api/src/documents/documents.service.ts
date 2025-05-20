@@ -4,6 +4,9 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { REQUEST } from '@nestjs/core';
 import { JwtPayloadDto } from 'src/auth/auth.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { randomUUID } from 'crypto';
+import { UploadUrlResponseType } from './documents.dto';
 
 @Injectable()
 export class DocumentsService {
@@ -12,6 +15,7 @@ export class DocumentsService {
   constructor(
     @Inject(REQUEST) private readonly request: Request,
     private configService: ConfigService,
+    private prismaService: PrismaService,
   ) {
     const s3Config: S3ClientConfig = {
       credentials: {
@@ -24,16 +28,14 @@ export class DocumentsService {
     this.s3Client = new S3Client(s3Config);
   }
 
-  async getUploadUrl(type: string): Promise<string> {
+  async getUploadUrl(type: string): Promise<UploadUrlResponseType> {
     if (!('user' in this.request)) {
       throw new UnauthorizedException();
     }
 
     const bucket = this.configService.getOrThrow('S3_BUCKET');
 
-    const { sub: identifier } = this.request.user as JwtPayloadDto;
-
-    const key = `${bucket}/${type}/${identifier}`;
+    const key = `${bucket}/${type}/${randomUUID()}`;
 
     const command = new PutObjectCommand({
       Bucket: bucket,
@@ -42,6 +44,17 @@ export class DocumentsService {
     const url = await getSignedUrl(this.s3Client, command, {
       expiresIn: 60 * 5, // 5 minutes
     });
-    return url;
+
+    const { sub: identifier } = this.request.user as JwtPayloadDto;
+
+    await this.prismaService.document.create({
+      data: {
+        userIdentifier: identifier,
+        type,
+        key,
+      },
+    });
+
+    return { url };
   }
 }

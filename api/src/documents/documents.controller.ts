@@ -5,7 +5,6 @@ import {
   ApiResponse,
   ApiTags,
   ApiBearerAuth,
-  ApiConsumes,
 } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { UploadUrlResponseType } from './documents.dto';
@@ -26,10 +25,8 @@ export class DocumentsController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @ApiConsumes('multipart/form-data')
   @Get('/upload/:type')
-  async getUploadUrl(@Param('type') type: string): Promise<{ url: string }> {
-    const url = await this.documentsService.getUploadUrl(type);
-    return { url };
+  getUploadUrl(@Param('type') type: string): Promise<UploadUrlResponseType> {
+    return this.documentsService.getUploadUrl(type);
   }
 }
