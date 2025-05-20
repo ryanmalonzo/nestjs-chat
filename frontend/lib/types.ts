@@ -32,3 +32,7 @@ export interface MessageResponse {
     updatedAt: string;
   };
 }
+
+export interface UploadUrlResponseType {
+  url: string;
+}

@@ -29,12 +29,14 @@ export class DocumentsService {
       throw new UnauthorizedException();
     }
 
+    const bucket = this.configService.getOrThrow('S3_BUCKET');
+
     const { sub: identifier } = this.request.user as JwtPayloadDto;
 
-    const key = `${type}/${identifier}`;
+    const key = `${bucket}/${type}/${identifier}`;
 
     const command = new PutObjectCommand({
-      Bucket: this.configService.getOrThrow('S3_BUCKET'),
+      Bucket: bucket,
       Key: key,
     });
     const url = await getSignedUrl(this.s3Client, command, {

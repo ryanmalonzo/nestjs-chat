@@ -1,4 +1,4 @@
-import { Controller, Param, Post, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Param, Get, HttpStatus, UseGuards } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import {
   ApiOperation,
@@ -27,7 +27,7 @@ export class DocumentsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @ApiConsumes('multipart/form-data')
-  @Post('/upload/:type')
+  @Get('/upload/:type')
   async getUploadUrl(@Param('type') type: string): Promise<{ url: string }> {
     const url = await this.documentsService.getUploadUrl(type);
     return { url };

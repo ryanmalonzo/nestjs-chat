@@ -1,8 +1,8 @@
 "use client";
 
-import { useId, useState } from "react";
+import { InputHTMLAttributes, useId, useState } from "react";
 import { ImagePlusIcon } from "lucide-react";
-import { useFileUpload } from "@/hooks/use-file-upload";
+import { FileWithPreview, useFileUpload } from "@/hooks/use-file-upload";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,19 +16,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UserResponse } from "@/lib/types";
+import { UploadUrlResponseType, UserResponse } from "@/lib/types";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-
-const initialAvatarImage = [
-  {
-    name: "avatar-72-01.jpg",
-    size: 1528737,
-    type: "image/jpeg",
-    url: "/avatar-72-01.jpg",
-    id: "avatar-123456789",
-  },
-];
+import ky from "ky";
 
 export function ProfileDialog({
   user,
@@ -39,10 +30,58 @@ export function ProfileDialog({
 }) {
   const id = useId();
 
+  // Profile Picture
+  const [{ files }, { openFileDialog, getInputProps }] = useFileUpload({
+    accept: "image/*",
+  });
+
+  const handleProfilePictureChange = async () => {
+    const file = files[0];
+    if (!file) return;
+
+    // Get Upload URL from backend
+    const uploadUrlResponse = await api.get(
+      `documents/upload/${DOCUMENT_CATEGORY}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      },
+    );
+
+    if (!uploadUrlResponse.ok) {
+      toast.error("Erreur lors de la mise à jour de la photo de profil");
+      return;
+    }
+
+    const { url: uploadUrl } =
+      (await uploadUrlResponse.json()) as UploadUrlResponseType;
+
+    // Upload file to S3
+    const s3UploadResponse = await ky.put(uploadUrl, {
+      headers: {
+        "Content-Type": file.file.type,
+      },
+      body: file.file as File,
+    });
+
+    if (!s3UploadResponse.ok) {
+      toast.error("Erreur lors de la mise à jour de la photo de profil");
+      return;
+    }
+  };
+
+  // User Fields
   const [username, setUsername] = useState(user.username);
   const [email, setEmail] = useState(user.email);
 
   const handleSubmit = async () => {
+    // Handle profile picture change
+    if (files.length > 0) {
+      await handleProfilePictureChange();
+    }
+
+    // Handle user fields change
     const response = await api.patch("users/me", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -79,7 +118,11 @@ export function ProfileDialog({
         </DialogDescription>
         <div className="overflow-y-auto">
           <ProfileBanner />
-          <Avatar />
+          <Avatar
+            files={files}
+            openFileDialog={openFileDialog}
+            getInputProps={getInputProps}
+          />
           <div className="px-6 pt-4 pb-6">
             <form className="space-y-4">
               {/* Username */}
@@ -145,12 +188,15 @@ function ProfileBanner() {
   );
 }
 
-function Avatar() {
-  const [{ files }, { openFileDialog, getInputProps }] = useFileUpload({
-    accept: "image/*",
-    initialFiles: initialAvatarImage,
-  });
+const DOCUMENT_CATEGORY = "profile-pictures";
 
+interface AvatarProps {
+  files: FileWithPreview[];
+  openFileDialog: () => void;
+  getInputProps: () => InputHTMLAttributes<HTMLInputElement>; // partial typing
+}
+
+function Avatar({ files, openFileDialog, getInputProps }: AvatarProps) {
   const currentImage = files[0]?.preview || null;
 
   return (
