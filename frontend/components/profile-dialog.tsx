@@ -2,7 +2,7 @@
 
 import { InputHTMLAttributes, useId, useState } from "react";
 import { ImagePlusIcon } from "lucide-react";
-import { useFileUpload } from "@/hooks/use-file-upload";
+import { FileWithPreview, useFileUpload } from "@/hooks/use-file-upload";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -119,6 +119,7 @@ export function ProfileDialog({
         <div className="overflow-y-auto">
           <ProfileBanner />
           <Avatar
+            files={files}
             openFileDialog={openFileDialog}
             getInputProps={getInputProps}
             profilePictureUrl={user.profilePictureUrl}
@@ -195,22 +196,26 @@ function ProfileBanner() {
 const DOCUMENT_CATEGORY = "profile-pictures";
 
 interface AvatarProps {
+  files: FileWithPreview[];
   openFileDialog: () => void;
   getInputProps: () => InputHTMLAttributes<HTMLInputElement>; // partial typing
   profilePictureUrl?: string;
 }
 
 function Avatar({
+  files,
   openFileDialog,
   getInputProps,
   profilePictureUrl,
 }: AvatarProps) {
+  const currentImage = files[0]?.preview || profilePictureUrl;
+
   return (
     <div className="-mt-10 px-6">
       <div className="border-background bg-muted relative flex size-20 items-center justify-center overflow-hidden rounded-full border-4 shadow-xs shadow-black/10">
-        {profilePictureUrl && (
+        {currentImage && (
           <img
-            src={profilePictureUrl}
+            src={currentImage}
             className="size-full object-cover"
             width={80}
             height={80}
