@@ -2,7 +2,7 @@
 
 import { InputHTMLAttributes, useId, useState } from "react";
 import { ImagePlusIcon } from "lucide-react";
-import { FileWithPreview, useFileUpload } from "@/hooks/use-file-upload";
+import { useFileUpload } from "@/hooks/use-file-upload";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -119,9 +119,9 @@ export function ProfileDialog({
         <div className="overflow-y-auto">
           <ProfileBanner />
           <Avatar
-            files={files}
             openFileDialog={openFileDialog}
             getInputProps={getInputProps}
+            profilePictureUrl={user.profilePictureUrl}
           />
           <div className="px-6 pt-4 pb-6">
             <form className="space-y-4">
@@ -165,12 +165,16 @@ export function ProfileDialog({
         </div>
         <DialogFooter className="border-t px-6 py-4">
           <DialogClose asChild>
-            <Button type="button" variant="outline">
+            <Button type="button" variant="outline" className="cursor-pointer">
               Annuler
             </Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button type="button" onClick={handleSubmit}>
+            <Button
+              type="button"
+              onClick={handleSubmit}
+              className="cursor-pointer"
+            >
               Sauvegarder
             </Button>
           </DialogClose>
@@ -191,20 +195,22 @@ function ProfileBanner() {
 const DOCUMENT_CATEGORY = "profile-pictures";
 
 interface AvatarProps {
-  files: FileWithPreview[];
   openFileDialog: () => void;
   getInputProps: () => InputHTMLAttributes<HTMLInputElement>; // partial typing
+  profilePictureUrl?: string;
 }
 
-function Avatar({ files, openFileDialog, getInputProps }: AvatarProps) {
-  const currentImage = files[0]?.preview || null;
-
+function Avatar({
+  openFileDialog,
+  getInputProps,
+  profilePictureUrl,
+}: AvatarProps) {
   return (
     <div className="-mt-10 px-6">
       <div className="border-background bg-muted relative flex size-20 items-center justify-center overflow-hidden rounded-full border-4 shadow-xs shadow-black/10">
-        {currentImage && (
+        {profilePictureUrl && (
           <img
-            src={currentImage}
+            src={profilePictureUrl}
             className="size-full object-cover"
             width={80}
             height={80}

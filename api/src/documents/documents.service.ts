@@ -1,4 +1,9 @@
-import { PutObjectCommand, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+  S3ClientConfig,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -56,5 +61,19 @@ export class DocumentsService {
     });
 
     return { url };
+  }
+
+  async getFileUrl(key: string): Promise<string> {
+    const bucket = this.configService.getOrThrow('S3_BUCKET');
+
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    });
+    const url = await getSignedUrl(this.s3Client, command, {
+      expiresIn: 60 * 15, // 15 minutes
+    });
+
+    return url;
   }
 }

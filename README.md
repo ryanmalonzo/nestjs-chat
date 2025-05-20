@@ -67,7 +67,7 @@ pnpm run dev # or npm run dev
 
 - [x] Logout Button
 - [x] Usernames
-- [ ] Avatars
+- [x] Avatars
 - [x] User Profiles
 - [ ] Multiple Channels
 - [ ] Dynamic Channel Creation

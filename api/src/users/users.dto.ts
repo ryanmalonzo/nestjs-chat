@@ -23,3 +23,9 @@ export class PartialUserDto implements Partial<Omit<User, 'hashedPassword'>> {
   @IsOptional()
   updatedAt: Date;
 }
+
+export class PartialUserWithProfilePictureDto extends PartialUserDto {
+  @ApiProperty({ description: 'Profile picture URL' })
+  @IsOptional()
+  profilePictureUrl?: string;
+}

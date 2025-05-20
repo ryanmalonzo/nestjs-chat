@@ -1,15 +1,11 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
-import { UserRoundIcon } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserRoundIcon } from "lucide-react";
 
-export function AvatarWithFallback() {
+export function AvatarWithFallback({ url }: { url?: string }) {
   return (
     <div className="relative">
       <Avatar className="rounded-md">
-        <AvatarImage src="./avatar-80-07.jpg" alt="Kelly King" />
+        <AvatarImage src={url} alt="Profile Picture" />
         <AvatarFallback>
           <UserRoundIcon size={16} className="opacity-60" aria-hidden="true" />
         </AvatarFallback>
@@ -18,5 +14,5 @@ export function AvatarWithFallback() {
         <span className="sr-only">Online</span>
       </span>
     </div>
-  )
+  );
 }

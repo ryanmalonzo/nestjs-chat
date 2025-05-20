@@ -17,6 +17,8 @@ import { UserResponse } from "@/lib/types";
 export function AvatarMenu({ user }: { user: UserResponse }) {
   const router = useRouter();
 
+  const { profilePictureUrl } = user;
+
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     router.push("/login");
@@ -36,7 +38,7 @@ export function AvatarMenu({ user }: { user: UserResponse }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="max-w-64">
         <DropdownMenuLabel className="flex items-start gap-3">
-          <AvatarWithFallback />
+          <AvatarWithFallback url={profilePictureUrl} />
           <div className="flex min-w-0 flex-col">
             <span className="text-foreground truncate text-sm font-medium">
               {user.username}
