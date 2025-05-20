@@ -11,6 +11,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-esgi}
       POSTGRES_DB: ${POSTGRES_DB:-esgi}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-esgi}"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
 
   adminer:
     image: adminer
@@ -19,6 +24,9 @@ services:
       - "8080:8080"
     environment:
       ADMINER_DESIGN: pepa-linha
+    depends_on:
+      db:
+        condition: service_healthy
 
   minio:
     image: quay.io/minio/minio
@@ -32,7 +40,28 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+
+  # Create the nestjs-chat bucket automatically
+  create-minio-bucket:
+    image: minio/mc # Use the MinIO Client image
+    container_name: nestjs-chat-minio-mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin};
+      /usr/bin/mc mb myminio/nestjs-chat || true;
+      echo 'MinIO bucket created or already exists: nestjs-chat';
+      exit 0;
+      "
 
 volumes:
   db-data:
   minio-data:
+
