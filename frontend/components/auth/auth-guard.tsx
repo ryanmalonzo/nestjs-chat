@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
+import { refreshUserData } from "@/lib/utils";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -16,19 +17,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const response = await api.get("users/me", {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const isUserAuthenticated = await refreshUserData();
 
-    if (!response.ok) {
+    if (!isUserAuthenticated) {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");
       router.push("/login");
-    } else {
-      const user = await response.json();
-      localStorage.setItem("user", JSON.stringify(user));
     }
   };
 

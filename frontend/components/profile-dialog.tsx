@@ -20,6 +20,7 @@ import { UploadUrlResponseType, UserResponse } from "@/lib/types";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import ky from "ky";
+import { refreshUserData } from "@/lib/utils";
 
 export function ProfileDialog({
   user,
@@ -99,6 +100,8 @@ export function ProfileDialog({
 
     const updatedUser = await response.json();
     localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    await refreshUserData();
 
     toast.success("Profil mis à jour avec succès");
   };
