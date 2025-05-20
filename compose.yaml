@@ -20,5 +20,19 @@ services:
     environment:
       ADMINER_DESIGN: pepa-linha
 
+  minio:
+    image: quay.io/minio/minio
+    container_name: nestjs-chat-minio
+    command: 'server /data --console-address ":9001"'
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - "minio-data:/data"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-esgi}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-esgiesgi}
+
 volumes:
   db-data:
+  minio-data:
