@@ -21,6 +21,7 @@ export function AvatarMenu({ user }: { user: UserResponse }) {
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
     router.push("/login");
   };
 

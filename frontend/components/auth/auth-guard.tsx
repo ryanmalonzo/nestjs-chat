@@ -24,6 +24,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
     if (!response.ok) {
       localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
       router.push("/login");
     } else {
       const user = await response.json();
