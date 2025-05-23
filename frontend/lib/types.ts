@@ -3,7 +3,7 @@ export interface RegisterUserDto {
   plainPassword: string;
 }
 
-export interface LoginUserDto extends RegisterUserDto {}
+export type LoginUserDto = RegisterUserDto;
 
 export interface JwtResponse {
   accessToken: string;
@@ -36,4 +36,11 @@ export interface MessageResponse {
 
 export interface UploadUrlResponseType {
   url: string;
+}
+
+export interface Channel {
+  identifier: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
 }

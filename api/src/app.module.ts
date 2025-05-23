@@ -7,11 +7,13 @@ import { ChatModule } from './chat/chat.module';
 import { UsersModule } from './users/users.module';
 import { MessagesModule } from './messages/messages.module';
 import { DocumentsModule } from './documents/documents.module';
+import { ChannelsModule } from './channels/channels.module';
 
 @Module({
   imports: [
     AuthModule,
     BcryptModule,
+    ChannelsModule,
     ChatModule,
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
@@ -19,6 +21,7 @@ import { DocumentsModule } from './documents/documents.module';
     UsersModule,
     MessagesModule,
     DocumentsModule,
+    ChannelsModule,
   ],
   controllers: [],
   providers: [],

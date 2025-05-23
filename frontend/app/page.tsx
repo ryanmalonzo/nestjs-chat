@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { api } from "@/lib/api";
-import { MessageResponse, UserResponse } from "@/lib/types";
+import { Channel, MessageResponse, UserResponse } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import {
   Dispatch,
@@ -29,7 +29,8 @@ import {
 import { io, Socket } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 
-const DEFAULT_CHANNEL = "general";
+const DEFAULT_CHANNELS = ["general", "food", "random"];
+const DEFAULT_ACTIVE_CHANNEL = "general";
 
 export default function Chat() {
   const router = useRouter();
@@ -43,7 +44,8 @@ export default function Chat() {
     identifier: "",
   });
 
-  const [currentChannel, setCurrentChannel] = useState(DEFAULT_CHANNEL);
+  const [channels, setChannels] = useState<string[]>(DEFAULT_CHANNELS);
+  const [currentChannel, setCurrentChannel] = useState(DEFAULT_ACTIVE_CHANNEL);
 
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
@@ -67,6 +69,29 @@ export default function Chat() {
       setUser(user);
     }
   }, [router]);
+
+  // Get channels from API
+  useEffect(() => {
+    const fetchChannels = async () => {
+      const response = await api.get("channels", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.log("Failed to load channels");
+        return;
+      }
+
+      const channels = (await response.json()) as Channel[];
+      setChannels(channels.map((channel) => channel.name));
+    };
+
+    if (accessToken) {
+      fetchChannels();
+    }
+  }, [accessToken]);
 
   // Connect to socket server
   useEffect(() => {
@@ -129,9 +154,8 @@ export default function Chat() {
     <AuthGuard>
       <div className="flex min-h-svh lg:h-svh items-center justify-center p-6 md:p-10">
         <div className="flex justify-center gap-3 w-full">
-          {/* TODO: query channels from api */}
           <ChannelSwitcher
-            channels={["general", "food", "random"]}
+            channels={channels}
             activeChannel={currentChannel}
             onChannelChange={(channel) => {
               setCurrentChannel(channel);
