@@ -4,12 +4,12 @@ import {
   Scope,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PartialUserDto, PartialUserWithProfilePictureDto } from './users.dto';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { JwtPayloadDto } from 'src/auth/auth.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { DocumentsService } from 'src/documents/documents.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { PartialUserDto, PartialUserWithProfilePictureDto } from './users.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
@@ -64,6 +64,7 @@ export class UsersService {
 
     const { sub: requestUserIdentifier } = this.request.user as JwtPayloadDto;
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { identifier, createdAt, updatedAt, ...rest } = data;
 
     const user = await this.prismaService.user.update({
