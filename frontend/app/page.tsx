@@ -2,6 +2,7 @@
 
 import AuthGuard from "@/components/auth/auth-guard";
 import { AvatarMenu } from "@/components/avatar-menu";
+import { ChannelSwitcher } from "@/components/chat/channel-switcher";
 import ChatBubble from "@/components/chat/chat-bubble";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,7 +43,7 @@ export default function Chat() {
     identifier: "",
   });
 
-  const [currentChannel] = useState(DEFAULT_CHANNEL);
+  const [currentChannel, setCurrentChannel] = useState(DEFAULT_CHANNEL);
 
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
@@ -99,36 +100,48 @@ export default function Chat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken]);
 
+  const fetchMessages = async (channel: string) => {
+    const response = await api.get(`messages/${channel}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.log("Failed to load messages");
+      return;
+    }
+
+    const messages = await response.json();
+
+    setMessages(messages as MessageResponse[]);
+  };
+
   // Fetch message history
   useEffect(() => {
-    const fetchMessages = async () => {
-      const response = await api.get(`messages/${currentChannel}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        console.log("Failed to load messages");
-        return;
-      }
-
-      const messages = await response.json();
-
-      setMessages(messages as MessageResponse[]);
-    };
-
     if (accessToken) {
-      fetchMessages();
+      fetchMessages(currentChannel);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessToken]);
+  }, [accessToken, currentChannel]);
 
   return (
     <AuthGuard>
-      <div className="flex min-h-svh lg:h-svh w-full items-center justify-center p-6 md:p-10">
-        <div className="w-full max-w-9/10 lg:max-w-5/10">
-          <div className="flex flex-col gap-6">
+      <div className="flex min-h-svh lg:h-svh items-center justify-center p-6 md:p-10">
+        <div className="flex justify-center gap-3 w-full">
+          {/* TODO: query channels from api */}
+          <ChannelSwitcher
+            channels={["general", "food", "random"]}
+            activeChannel={currentChannel}
+            onChannelChange={(channel) => {
+              setCurrentChannel(channel);
+              if (socket) {
+                socket.emit("joinChannel", channel);
+              }
+            }}
+            className="flex-col"
+          />
+          <div className="w-full max-w-9/10 lg:max-w-5/10">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -141,6 +154,7 @@ export default function Chat() {
               </CardHeader>
               <CardContent>
                 <ChatArea
+                  channel={currentChannel}
                   messages={messages}
                   setMessages={setMessages}
                   user={user}
@@ -156,13 +170,20 @@ export default function Chat() {
 }
 
 interface ChatAreaProps {
+  channel: string;
   messages: MessageResponse[];
   setMessages: Dispatch<SetStateAction<MessageResponse[]>>;
   user: UserResponse;
   socket: Socket | null;
 }
 
-function ChatArea({ messages, setMessages, user, socket }: ChatAreaProps) {
+function ChatArea({
+  channel,
+  messages,
+  setMessages,
+  user,
+  socket,
+}: ChatAreaProps) {
   const [messageInput, setMessageInput] = useState("");
 
   const scrollAreaRef = useRef(null);
@@ -203,7 +224,7 @@ function ChatArea({ messages, setMessages, user, socket }: ChatAreaProps) {
         socket.emit(
           "message",
           {
-            channel: "general",
+            channel: channel,
             content: messageInput,
           },
           (messageOutput: MessageResponse) => {
@@ -213,7 +234,7 @@ function ChatArea({ messages, setMessages, user, socket }: ChatAreaProps) {
                 messageOutput,
               ]);
             });
-          }
+          },
         );
       }
     });
@@ -225,7 +246,7 @@ function ChatArea({ messages, setMessages, user, socket }: ChatAreaProps) {
       {
         identifier: uuidv4(),
         fromUserIdentifier: uuidv4(),
-        channel: "general",
+        channel,
         content: newMessage as string,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -238,12 +259,12 @@ function ChatArea({ messages, setMessages, user, socket }: ChatAreaProps) {
         },
       },
       ...state,
-    ]
+    ],
   );
 
   return (
     <>
-      <ScrollArea type="auto" className="h-[70svh] lg:px-5">
+      <ScrollArea type="auto" className="h-[65svh] lg:px-5">
         <div className="space-y-5" ref={scrollAreaRef}>
           {optimisticMessages.length > 0 &&
             optimisticMessages.map((message) => (

@@ -20,15 +20,18 @@ async function main() {
   });
   console.log('Default user created:', defaultUser);
 
-  // Create default channel
-  const defaultChannel = await prisma.channel.upsert({
-    where: { name: 'general' },
-    update: {},
-    create: {
-      name: 'general',
-    },
-  });
-  console.log('Default channel created:', defaultChannel);
+  // Create default channels
+  const defaultChannels = ['general', 'food', 'random'];
+  for (const channelName of defaultChannels) {
+    const channel = await prisma.channel.upsert({
+      where: { name: channelName },
+      update: {},
+      create: {
+        name: channelName,
+      },
+    });
+    console.log('Default channel created:', channel);
+  }
 }
 
 main()
