@@ -5,20 +5,33 @@ import { SALT_ROUNDS } from '../src/bcrypt/bcrypt.service';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create default user
-  const email = 'esgi@esgi.fr';
-  const hashedPassword = await bcrypt.hash('password', SALT_ROUNDS);
-
-  const defaultUser = await prisma.user.upsert({
-    where: { email },
-    update: {},
-    create: {
-      username: email,
-      email,
-      hashedPassword,
+  // Create default users
+  const defaultUsers = [
+    {
+      username: 'esgi1',
+      email: 'esgi1@myges.fr',
+      hashedPassword: await bcrypt.hash('esgi1', SALT_ROUNDS),
     },
-  });
-  console.log('Default user created:', defaultUser);
+    {
+      username: 'esgi2',
+      email: 'esgi2@myges.fr',
+      hashedPassword: await bcrypt.hash('esgi2', SALT_ROUNDS),
+    },
+  ];
+
+  for (const user of defaultUsers) {
+    const { username, email, hashedPassword } = user;
+    const createdUser = await prisma.user.upsert({
+      where: { email },
+      update: {},
+      create: {
+        username,
+        email,
+        hashedPassword,
+      },
+    });
+    console.log('Default user created:', createdUser);
+  }
 
   // Create default channels
   const defaultChannels = ['general', 'food', 'random'];
