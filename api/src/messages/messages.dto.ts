@@ -1,5 +1,5 @@
-import { Prisma } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { Prisma } from '@prisma/client';
 
 export type MessagesResponseType = Prisma.MessageGetPayload<{
   include: {
@@ -23,6 +23,12 @@ export class MessagesResponseDto implements MessagesResponseType {
     example: '123e4567-e89b-12d3-a456-426614174001',
   })
   fromUserIdentifier: string;
+
+  @ApiProperty({
+    description: 'Identifier of the channel where the message was sent',
+    example: '123e4567-e89b-12d3-a456-426614174002',
+  })
+  channelIdentifier: string;
 
   @ApiProperty({
     description: 'Channel where the message was posted',

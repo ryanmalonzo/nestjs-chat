@@ -1,18 +1,9 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-  useRef,
-  useOptimistic,
-  startTransition,
-  Dispatch,
-  SetStateAction,
-} from "react";
-import { useRouter } from "next/navigation";
-import { io, Socket } from "socket.io-client";
-import { v4 as uuidv4 } from "uuid";
 import AuthGuard from "@/components/auth/auth-guard";
+import { AvatarMenu } from "@/components/avatar-menu";
+import ChatBubble from "@/components/chat/chat-bubble";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -20,13 +11,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { api } from "@/lib/api";
 import { MessageResponse, UserResponse } from "@/lib/types";
-import ChatBubble from "@/components/chat/chat-bubble";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { AvatarMenu } from "@/components/avatar-menu";
+import { useRouter } from "next/navigation";
+import {
+  Dispatch,
+  SetStateAction,
+  startTransition,
+  useEffect,
+  useOptimistic,
+  useRef,
+  useState,
+} from "react";
+import { io, Socket } from "socket.io-client";
+import { v4 as uuidv4 } from "uuid";
+
+const DEFAULT_CHANNEL = "general";
 
 export default function Chat() {
   const router = useRouter();
@@ -39,6 +41,8 @@ export default function Chat() {
     updatedAt: "",
     identifier: "",
   });
+
+  const [currentChannel] = useState(DEFAULT_CHANNEL);
 
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
@@ -75,11 +79,10 @@ export default function Chat() {
       });
 
       newSocket.on("connect", () => {
-        console.log("Socket connected");
+        newSocket.emit("joinChannel", currentChannel);
       });
 
-      newSocket.on("general", (newMessage: MessageResponse) => {
-        // Handled by the child ChatArea component
+      newSocket.on("message", (newMessage: MessageResponse) => {
         if (newMessage.fromUser.email === user.email) return;
         setMessages((previousMessages) => [...previousMessages, newMessage]);
       });
@@ -93,12 +96,13 @@ export default function Chat() {
         socket.disconnect();
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken]);
 
   // Fetch message history
   useEffect(() => {
     const fetchMessages = async () => {
-      const response = await api.get("messages/general", {
+      const response = await api.get(`messages/${currentChannel}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -117,6 +121,7 @@ export default function Chat() {
     if (accessToken) {
       fetchMessages();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken]);
 
   return (
@@ -131,7 +136,7 @@ export default function Chat() {
                   <AvatarMenu user={user} />
                 </CardTitle>
                 <CardDescription>
-                  Bienvenue dans <strong>#general</strong> !
+                  Bienvenue dans <strong>#{currentChannel}</strong> !
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -196,8 +201,11 @@ function ChatArea({ messages, setMessages, user, socket }: ChatAreaProps) {
     startTransition(() => {
       if (socket) {
         socket.emit(
-          "general",
-          messageInput,
+          "message",
+          {
+            channel: "general",
+            content: messageInput,
+          },
           (messageOutput: MessageResponse) => {
             startTransition(() => {
               setMessages((previousMessages) => [
@@ -205,7 +213,7 @@ function ChatArea({ messages, setMessages, user, socket }: ChatAreaProps) {
                 messageOutput,
               ]);
             });
-          },
+          }
         );
       }
     });
@@ -230,7 +238,7 @@ function ChatArea({ messages, setMessages, user, socket }: ChatAreaProps) {
         },
       },
       ...state,
-    ],
+    ]
   );
 
   return (

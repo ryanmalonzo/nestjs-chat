@@ -18,11 +18,20 @@ model User {
   Document       Document[]
 }
 
+model Channel {
+  identifier String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String    @unique
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
+  messages   Message[]
+}
+
 model Message {
   identifier         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   fromUser           User     @relation(fields: [fromUserIdentifier], references: [identifier])
   fromUserIdentifier String   @db.Uuid
-  channel            String
+  channel            Channel  @relation(fields: [channelIdentifier], references: [identifier])
+  channelIdentifier  String   @db.Uuid
   content            String
   createdAt          DateTime @default(now())
   updatedAt          DateTime @default(now()) @updatedAt

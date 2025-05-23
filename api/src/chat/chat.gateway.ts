@@ -9,9 +9,9 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { SocketWithUserDto } from './chat.dto';
-import { MessagesService } from 'src/messages/messages.service';
 import { AuthService } from 'src/auth/auth.service';
+import { MessagesService } from 'src/messages/messages.service';
+import { ChannelMessageDto, SocketWithUserDto } from './chat.dto';
 
 @WebSocketGateway({
   allowUpgrades: false,
@@ -37,31 +37,39 @@ export class ChatGateway implements OnGatewayConnection {
   }
 
   @UseGuards(AuthGuard)
-  @SubscribeMessage('general')
-  async handleMessage(
-    @MessageBody() content: string,
+  @SubscribeMessage('joinChannel')
+  async handleJoinChannel(
+    @MessageBody() channel: string,
     @ConnectedSocket() client: SocketWithUserDto,
   ) {
-    if (!content) {
+    await client.join(channel);
+    this.logger.log(`${client.user.email} joined channel ${channel}`);
+    return { success: true };
+  }
+
+  @UseGuards(AuthGuard)
+  @SubscribeMessage('message')
+  async handleMessage(
+    @MessageBody() data: ChannelMessageDto,
+    @ConnectedSocket() client: SocketWithUserDto,
+  ) {
+    if (!data.content || !data.channel) {
       throw new UnauthorizedException();
     }
 
     const user = await this.authService.findUserByEmail(client.user.email);
-
     if (!user) {
       throw new UnauthorizedException();
     }
 
-    const createdMessage = await this.messagesService.createMessage({
-      channel: 'general',
-      content: content,
-      fromUser: {
-        connect: user,
-      },
-    });
-    this.server.emit('general', createdMessage);
+    const createdMessage = await this.messagesService.createMessage(
+      data.content,
+      data.channel,
+      user,
+    );
 
-    this.logger.log(`${client.user.email}: ${content}`);
+    this.server.to(data.channel).emit('message', createdMessage);
+    this.logger.log(`${client.user.email} in ${data.channel}: ${data.content}`);
 
     return createdMessage;
   }
