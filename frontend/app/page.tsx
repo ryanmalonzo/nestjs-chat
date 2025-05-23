@@ -45,7 +45,13 @@ export default function Chat() {
   });
 
   const [channels, setChannels] = useState<string[]>(DEFAULT_CHANNELS);
-  const [currentChannel, setCurrentChannel] = useState(DEFAULT_ACTIVE_CHANNEL);
+
+  const [lastChannel, setLastChannel] = useState<string>(
+    DEFAULT_ACTIVE_CHANNEL,
+  );
+  const [currentChannel, setCurrentChannel] = useState<string>(
+    DEFAULT_ACTIVE_CHANNEL,
+  );
 
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
@@ -95,7 +101,14 @@ export default function Chat() {
 
   // Connect to socket server
   useEffect(() => {
-    if (accessToken && !socketInitialized.current) {
+    if (
+      accessToken &&
+      (!socketInitialized.current || currentChannel !== lastChannel)
+    ) {
+      if (socket) {
+        socket.disconnect();
+      }
+
       const newSocket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
         extraHeaders: {
           Authorization: `Bearer ${accessToken}`,
@@ -123,7 +136,7 @@ export default function Chat() {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessToken]);
+  }, [accessToken, currentChannel]);
 
   const fetchMessages = async (channel: string) => {
     const response = await api.get(`messages/${channel}`, {
@@ -158,6 +171,7 @@ export default function Chat() {
             channels={channels}
             activeChannel={currentChannel}
             onChannelChange={(channel) => {
+              setLastChannel(currentChannel);
               setCurrentChannel(channel);
               if (socket) {
                 socket.emit("joinChannel", channel);
