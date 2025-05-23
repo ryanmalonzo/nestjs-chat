@@ -1,8 +1,5 @@
 "use client";
 
-import { InputHTMLAttributes, useId, useState } from "react";
-import { ImagePlusIcon } from "lucide-react";
-import { FileWithPreview, useFileUpload } from "@/hooks/use-file-upload";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,11 +13,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UploadUrlResponseType, UserResponse } from "@/lib/types";
+import { FileWithPreview, useFileUpload } from "@/hooks/use-file-upload";
 import { api } from "@/lib/api";
-import { toast } from "sonner";
-import ky from "ky";
+import { UploadUrlResponseType, UserResponse } from "@/lib/types";
 import { refreshUserData } from "@/lib/utils";
+import ky from "ky";
+import { ImagePlusIcon } from "lucide-react";
+import { InputHTMLAttributes, useId, useState } from "react";
+import { toast } from "sonner";
+import Image from "next/image";
 
 export function ProfileDialog({
   user,
@@ -217,7 +218,7 @@ function Avatar({
     <div className="-mt-10 px-6">
       <div className="border-background bg-muted relative flex size-20 items-center justify-center overflow-hidden rounded-full border-4 shadow-xs shadow-black/10">
         {currentImage && (
-          <img
+          <Image
             src={currentImage}
             className="size-full object-cover"
             width={80}
