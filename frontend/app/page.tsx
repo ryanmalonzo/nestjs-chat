@@ -49,7 +49,7 @@ export default function Chat() {
 
   const socketInitialized = useRef(false);
 
-  // Get email and access token
+  // Get access token and user
   useEffect(() => {
     if (router) {
       const localAccessToken = localStorage.getItem("accessToken");

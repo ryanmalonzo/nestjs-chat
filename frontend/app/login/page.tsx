@@ -1,10 +1,11 @@
 "use client";
 
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { LoginForm } from "@/components/auth/login-form";
 import { api } from "@/lib/api";
 import { JwtResponse, LoginUserDto } from "@/lib/types";
+import { refreshUserData } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Login() {
   const router = useRouter();
@@ -24,6 +25,8 @@ export default function Login() {
 
     const { accessToken } = (await response.json()) as JwtResponse;
     localStorage.setItem("accessToken", accessToken);
+
+    await refreshUserData();
 
     router.push("/chat");
   };

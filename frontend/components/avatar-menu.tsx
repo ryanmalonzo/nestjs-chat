@@ -8,11 +8,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { UserResponse } from "@/lib/types";
 import { CircleUserRoundIcon, LogOutIcon, UserPenIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AvatarWithFallback } from "./avatar-with-fallback";
 import { ProfileDialog } from "./profile-dialog";
-import { UserResponse } from "@/lib/types";
 
 export function AvatarMenu({ user }: { user: UserResponse }) {
   const router = useRouter();
@@ -20,8 +20,7 @@ export function AvatarMenu({ user }: { user: UserResponse }) {
   const { profilePictureUrl } = user;
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
+    localStorage.clear();
     router.push("/login");
   };
 

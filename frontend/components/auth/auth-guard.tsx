@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { api } from "@/lib/api";
 import { refreshUserData } from "@/lib/utils";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -20,8 +19,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const isUserAuthenticated = await refreshUserData();
 
     if (!isUserAuthenticated) {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("user");
+      localStorage.clear();
       router.push("/login");
     }
   };

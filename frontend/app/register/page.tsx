@@ -1,10 +1,11 @@
 "use client";
 
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { RegisterForm } from "@/components/auth/register-form";
 import { api } from "@/lib/api";
 import { JwtResponse, RegisterUserDto } from "@/lib/types";
+import { refreshUserData } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Register() {
   const router = useRouter();
@@ -24,6 +25,8 @@ export default function Register() {
 
     const { accessToken } = (await response.json()) as JwtResponse;
     localStorage.setItem("accessToken", accessToken);
+
+    await refreshUserData();
 
     router.push("/chat");
   };
