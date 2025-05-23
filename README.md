@@ -34,31 +34,31 @@ docker compose up -d
 4. Install the backend dependencies
 
 ```bash
-cd api && pnpm i # or npm install
+cd api && npm i
 ```
 
 5. Run the database migrations
 
 ```bash
-pnpm dlx prisma migrate dev # or npx prisma migrate dev
+npx prisma migrate dev
 ```
 
 6. Start the backend server
 
 ```bash
-pnpm run start:dev # or npm run start:dev
+npm run start:dev # or npm run dev
 ```
 
 7. Install the frontend dependencies
 
 ```bash
-cd ../frontend && pnpm i # or npm install
+cd ../frontend && npm i
 ```
 
 8. Start the frontend server
 
 ```bash
-pnpm run dev # or npm run dev
+npm run dev
 ```
 
 9. Open [http://localhost:5173](http://localhost:5173) in your browser to use the application
