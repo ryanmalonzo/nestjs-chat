@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoginUserDto, RegisterUserDto } from "@/lib/types";
+import { useState } from "react";
 
 interface AuthFormProps {
   title: string;

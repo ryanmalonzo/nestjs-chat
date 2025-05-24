@@ -28,6 +28,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     if (pathname && router) {
       checkIfUserIsAuthenticated();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, router]);
 
   return children;
