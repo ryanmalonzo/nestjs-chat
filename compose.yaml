@@ -10,7 +10,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-esgi}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-esgi}
       POSTGRES_DB: ${POSTGRES_DB:-esgi}
-    restart: unless-stopped
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-esgi}"]
       interval: 5s
