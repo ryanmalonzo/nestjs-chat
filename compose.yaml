@@ -12,7 +12,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-esgi}
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-esgi}"]
-      interval: 5s
+      interval: 2s
       timeout: 10s
       retries: 3
 
@@ -41,7 +41,7 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 5s
+      interval: 2s
       timeout: 10s
       retries: 3
 
@@ -56,7 +56,9 @@ services:
       /bin/sh -c "
       /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin};
       /usr/bin/mc mb myminio/nestjs-chat || true;
+      /usr/bin/mc anonymous set download myminio/nestjs-chat;
       echo 'MinIO bucket created or already exists: nestjs-chat';
+      echo 'MinIO bucket policy set to public for downloads';
       exit 0;
       "
 
