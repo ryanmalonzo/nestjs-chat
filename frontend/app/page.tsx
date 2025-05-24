@@ -110,8 +110,8 @@ export default function Chat() {
       }
 
       const newSocket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
-        extraHeaders: {
-          Authorization: `Bearer ${accessToken}`,
+        auth: {
+          token: accessToken,
         },
         transports: ["polling"],
         withCredentials: true,

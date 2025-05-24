@@ -6,43 +6,42 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { Socket } from 'socket.io';
+import { JwtPayloadDto } from './auth.dto';
+
+interface AuthenticatedRequest extends Request {
+  user: JwtPayloadDto;
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractTokenFromHeader(request);
+
     if (!token) {
       throw new UnauthorizedException();
     }
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync<JwtPayloadDto>(token, {
         secret: process.env.JWT_SECRET,
       });
 
-      // See chat.dto.ts (SocketWithUserDto)
-      request['user'] = payload;
+      // Attach user to request for HTTP contexts
+      (request as AuthenticatedRequest).user = payload;
     } catch {
       throw new UnauthorizedException();
     }
     return true;
   }
 
-  private extractTokenFromHeader(
-    request: Request | Socket,
-  ): string | undefined {
-    // When using socket.io, the headers are under `request.handshake.headers`,
-    // not `request.headers`
-    if ('handshake' in request) {
-      const [type, token] =
-        request.handshake.headers.authorization?.split(' ') ?? [];
-      return type === 'Bearer' ? token : undefined;
-    } else if ('headers' in request) {
-      const [type, token] = request.headers.authorization?.split(' ') ?? [];
+  private extractTokenFromHeader(request: Request): string | undefined {
+    const authHeader = request.headers.authorization;
+    if (authHeader) {
+      const [type, token] = authHeader.split(' ');
       return type === 'Bearer' ? token : undefined;
     }
+    return undefined;
   }
 }
