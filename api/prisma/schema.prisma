@@ -8,14 +8,14 @@ datasource db {
 }
 
 model User {
-  identifier     String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  username       String     @unique
-  email          String     @unique
-  hashedPassword String
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @default(now()) @updatedAt
-  Message        Message[]
-  Document       Document[]
+  identifier        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username          String    @unique
+  email             String    @unique
+  hashedPassword    String
+  profilePictureUrl String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @default(now()) @updatedAt
+  Message           Message[]
 }
 
 model Channel {
@@ -35,14 +35,4 @@ model Message {
   content            String
   createdAt          DateTime @default(now())
   updatedAt          DateTime @default(now()) @updatedAt
-}
-
-model Document {
-  identifier     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  type           String
-  key            String   @unique
-  user           User     @relation(fields: [userIdentifier], references: [identifier])
-  userIdentifier String   @db.Uuid
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now()) @updatedAt
 }

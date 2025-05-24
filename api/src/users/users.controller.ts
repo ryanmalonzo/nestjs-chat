@@ -1,12 +1,12 @@
 import {
-  Controller,
-  HttpStatus,
-  Get,
-  UseGuards,
-  Patch,
   Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -14,7 +14,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { PartialUserDto } from './users.dto';
+import { PartialUserDto, UploadUrlResponseDto } from './users.dto';
+import { UsersService } from './users.service';
 
 @ApiTags('users')
 @Controller('users')
@@ -51,5 +52,23 @@ export class UsersController {
   @Patch('/me')
   async updateUser(@Body() data: PartialUserDto): Promise<PartialUserDto> {
     return this.usersService.updateUser(data);
+  }
+
+  @ApiOperation({
+    summary: 'Get profile picture upload URL',
+    description: 'Get a signed URL for uploading a profile picture to S3',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'The signed URL for uploading the profile picture',
+    type: UploadUrlResponseDto,
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Get('/profile-picture/upload/:extension')
+  async getProfilePictureUploadUrl(
+    @Param('extension') extension: string,
+  ): Promise<UploadUrlResponseDto> {
+    return this.usersService.getProfilePictureUploadUrl(extension);
   }
 }

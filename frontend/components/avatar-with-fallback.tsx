@@ -1,11 +1,18 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserRoundIcon } from "lucide-react";
 
-export function AvatarWithFallback({ url }: { url?: string }) {
+export function AvatarWithFallback({ url }: { url?: string | null }) {
   return (
     <div className="relative">
       <Avatar className="rounded-md">
-        <AvatarImage src={url} alt="Profile Picture" />
+        <AvatarImage
+          src={url || undefined}
+          alt="Profile Picture"
+          onError={(e) => {
+            // Hide broken images gracefully
+            e.currentTarget.style.display = "none";
+          }}
+        />
         <AvatarFallback>
           <UserRoundIcon size={16} className="opacity-60" aria-hidden="true" />
         </AvatarFallback>

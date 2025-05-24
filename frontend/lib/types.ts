@@ -29,6 +29,7 @@ export interface MessageResponse {
     identifier: string;
     username: string;
     email: string;
+    profilePictureUrl: string | null;
     createdAt: string;
     updatedAt: string;
   };

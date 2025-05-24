@@ -18,10 +18,10 @@ import { api } from "@/lib/api";
 import { UploadUrlResponseType, UserResponse } from "@/lib/types";
 import { refreshUserData } from "@/lib/utils";
 import ky from "ky";
-import { ImagePlusIcon } from "lucide-react";
+import { ImagePlusIcon, UserRoundIcon } from "lucide-react";
+import Image from "next/image";
 import { InputHTMLAttributes, useId, useState } from "react";
 import { toast } from "sonner";
-import Image from "next/image";
 
 export function ProfileDialog({
   user,
@@ -41,14 +41,21 @@ export function ProfileDialog({
     const file = files[0];
     if (!file) return;
 
+    // Extract file extension
+    const fileExtension = file.file.name.split(".").pop()?.toLowerCase();
+    if (!fileExtension) {
+      toast.error("Extension de fichier invalide");
+      return;
+    }
+
     // Get Upload URL from backend
     const uploadUrlResponse = await api.get(
-      `documents/upload/${DOCUMENT_CATEGORY}`,
+      `users/profile-picture/upload/${fileExtension}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
-      },
+      }
     );
 
     if (!uploadUrlResponse.ok) {
@@ -197,8 +204,6 @@ function ProfileBanner() {
   );
 }
 
-const DOCUMENT_CATEGORY = "profile-pictures";
-
 interface AvatarProps {
   files: FileWithPreview[];
   openFileDialog: () => void;
@@ -217,14 +222,20 @@ function Avatar({
   return (
     <div className="-mt-10 px-6">
       <div className="border-background bg-muted relative flex size-20 items-center justify-center overflow-hidden rounded-full border-4 shadow-xs shadow-black/10">
-        {currentImage && (
+        {currentImage ? (
           <Image
             src={currentImage}
             className="size-full object-cover"
             width={80}
             height={80}
             alt="Profile image"
+            onError={(e) => {
+              // Hide broken images gracefully
+              e.currentTarget.style.display = "none";
+            }}
           />
+        ) : (
+          <UserRoundIcon size={32} className="opacity-60" aria-hidden="true" />
         )}
         <button
           type="button"

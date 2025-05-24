@@ -292,12 +292,13 @@ function ChatArea({
           identifier: uuidv4(),
           username: user.username,
           email: user.email,
+          profilePictureUrl: user.profilePictureUrl || null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
       },
       ...state,
-    ],
+    ]
   );
 
   return (

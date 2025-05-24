@@ -1,25 +1,41 @@
+import { PutObjectCommand, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import {
   Inject,
   Injectable,
   Scope,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { JwtPayloadDto } from 'src/auth/auth.dto';
-import { DocumentsService } from 'src/documents/documents.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PartialUserDto, PartialUserWithProfilePictureDto } from './users.dto';
+import { PartialUserDto, UploadUrlResponseDto } from './users.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
+  private readonly s3Client: S3Client;
+
   constructor(
     @Inject(REQUEST) private readonly request: Request,
     private readonly prismaService: PrismaService,
-    private readonly documentsService: DocumentsService,
-  ) {}
+    private configService: ConfigService,
+  ) {
+    const s3Config: S3ClientConfig = {
+      credentials: {
+        accessKeyId: this.configService.getOrThrow<string>('S3_ACCESS_KEY_ID'),
+        secretAccessKey: this.configService.getOrThrow<string>(
+          'S3_SECRET_ACCESS_KEY',
+        ),
+      },
+      endpoint: this.configService.getOrThrow<string>('S3_ENDPOINT'),
+      region: this.configService.getOrThrow<string>('S3_REGION'),
+    };
+    this.s3Client = new S3Client(s3Config);
+  }
 
-  async me(): Promise<PartialUserWithProfilePictureDto> {
+  async me(): Promise<PartialUserDto> {
     if (!('user' in this.request)) {
       throw new UnauthorizedException();
     }
@@ -35,26 +51,7 @@ export class UsersService {
       throw new UnauthorizedException();
     }
 
-    // Check if the user has a profile picture
-    const profilePicture = await this.prismaService.document.findFirst({
-      where: {
-        userIdentifier: identifier,
-        type: 'profile-pictures',
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-
-    if (!profilePicture) {
-      return user;
-    }
-
-    const profilePictureUrl = await this.documentsService.getFileUrl(
-      profilePicture.key,
-    );
-
-    return { ...user, profilePictureUrl };
+    return user;
   }
 
   async updateUser(data: PartialUserDto): Promise<PartialUserDto> {
@@ -74,5 +71,37 @@ export class UsersService {
     });
 
     return user;
+  }
+
+  async getProfilePictureUploadUrl(
+    fileExtension: string,
+  ): Promise<UploadUrlResponseDto> {
+    if (!('user' in this.request)) {
+      throw new UnauthorizedException();
+    }
+
+    const { sub: identifier } = this.request.user as JwtPayloadDto;
+    const bucket = this.configService.getOrThrow<string>('S3_BUCKET');
+    const s3Endpoint = this.configService.getOrThrow<string>('S3_ENDPOINT');
+
+    const key = `${identifier}.${fileExtension}`;
+
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: `${bucket}/${key}`,
+    });
+
+    const url = await getSignedUrl(this.s3Client, command, {
+      expiresIn: 60 * 5, // 5 minutes
+    });
+
+    // Update user's profilePictureUrl immediately
+    const profilePictureUrl = `${s3Endpoint}/${bucket}/${key}`;
+    await this.prismaService.user.update({
+      where: { identifier },
+      data: { profilePictureUrl },
+    });
+
+    return { url };
   }
 }

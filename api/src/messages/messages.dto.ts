@@ -68,6 +68,12 @@ export class MessagesResponseDto implements MessagesResponseType {
         description: 'Email of the user',
         example: 'john.doe@example.com',
       },
+      profilePictureUrl: {
+        type: 'string',
+        description: 'URL of the user profile picture',
+        example: 'https://example.com/profiles/user123.jpg',
+        nullable: true,
+      },
       createdAt: {
         type: 'string',
         format: 'date-time',
@@ -86,6 +92,7 @@ export class MessagesResponseDto implements MessagesResponseType {
     identifier: string;
     username: string;
     email: string;
+    profilePictureUrl: string | null;
     createdAt: Date;
     updatedAt: Date;
   };

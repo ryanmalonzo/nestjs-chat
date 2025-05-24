@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
-import { BcryptModule } from './bcrypt/bcrypt.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { ChatModule } from './chat/chat.module';
-import { UsersModule } from './users/users.module';
-import { MessagesModule } from './messages/messages.module';
-import { DocumentsModule } from './documents/documents.module';
+import { AuthModule } from './auth/auth.module';
+import { BcryptModule } from './bcrypt/bcrypt.module';
 import { ChannelsModule } from './channels/channels.module';
+import { ChatModule } from './chat/chat.module';
+import { MessagesModule } from './messages/messages.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { ChannelsModule } from './channels/channels.module';
     ChatModule,
     UsersModule,
     MessagesModule,
-    DocumentsModule,
     ChannelsModule,
   ],
   controllers: [],

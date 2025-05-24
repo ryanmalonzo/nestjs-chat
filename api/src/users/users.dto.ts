@@ -1,31 +1,37 @@
-import { User } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from '@prisma/client';
 import { IsOptional } from 'class-validator';
 
 export class PartialUserDto implements Partial<Omit<User, 'hashedPassword'>> {
   @ApiProperty({ description: 'User identifier (UUID)' })
   @IsOptional()
-  identifier: string;
+  identifier?: string;
 
   @ApiProperty({ description: 'Username' })
   @IsOptional()
-  username: string;
+  username?: string;
 
   @ApiProperty({ description: 'User email' })
   @IsOptional()
-  email: string;
+  email?: string;
+
+  @ApiProperty({ description: 'Profile picture URL' })
+  @IsOptional()
+  profilePictureUrl?: string | null;
 
   @ApiProperty({ description: 'Creation timestamp' })
   @IsOptional()
-  createdAt: Date;
+  createdAt?: Date;
 
   @ApiProperty({ description: 'Last update timestamp' })
   @IsOptional()
-  updatedAt: Date;
+  updatedAt?: Date;
 }
 
-export class PartialUserWithProfilePictureDto extends PartialUserDto {
-  @ApiProperty({ description: 'Profile picture URL' })
-  @IsOptional()
-  profilePictureUrl?: string;
+export class UploadUrlResponseDto {
+  @ApiProperty({
+    description: 'The URL to upload the profile picture',
+    example: 'https://example.com/upload/12345',
+  })
+  url: string;
 }

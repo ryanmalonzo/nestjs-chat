@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  images: {
+    remotePatterns: [new URL("http://localhost:9000/nestjs-chat/**")],
+  },
 };
 
 export default nextConfig;
