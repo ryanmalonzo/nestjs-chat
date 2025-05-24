@@ -283,13 +283,13 @@ function ChatArea({
     (state, newMessage) => [
       {
         identifier: uuidv4(),
-        fromUserIdentifier: uuidv4(),
+        fromUserIdentifier: user.identifier,
         channel,
         content: newMessage as string,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         fromUser: {
-          identifier: uuidv4(),
+          identifier: user.identifier,
           username: user.username,
           email: user.email,
           profilePictureUrl: user.profilePictureUrl || null,

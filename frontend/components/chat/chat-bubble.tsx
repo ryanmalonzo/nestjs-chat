@@ -1,5 +1,6 @@
 import { MessageResponse } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { ChatAvatar } from "./chat-avatar";
 
 interface ChatBubbleProps {
   userIdentifier: string;
@@ -27,18 +28,31 @@ export default function ChatBubble({
 
   return (
     <div className="flex flex-col gap-1">
-      <p
+      <div
         className={cn(
-          "text-xs text-gray-500 mb-1 ml-2 font-medium",
-          extraMetadataClasses,
+          "flex items-center gap-2 mb-1",
+          isOwnMessage ? "justify-end" : "justify-start"
         )}
       >
-        {isOwnMessage ? "Moi" : message.fromUser.username}
-      </p>
+        {!isOwnMessage && (
+          <ChatAvatar url={message.fromUser.profilePictureUrl} />
+        )}
+        <p
+          className={cn(
+            "text-xs text-gray-500 font-medium",
+            isOwnMessage ? "text-right" : "text-left"
+          )}
+        >
+          {isOwnMessage ? "Moi" : message.fromUser.username}
+        </p>
+        {isOwnMessage && (
+          <ChatAvatar url={message.fromUser.profilePictureUrl} />
+        )}
+      </div>
       <div
         className={cn(
           "flex lg:max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm bg-primary text-primary-foreground",
-          extraBubbleClasses,
+          extraBubbleClasses
         )}
       >
         {message.content}
