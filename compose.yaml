@@ -28,7 +28,7 @@ services:
         condition: service_healthy
 
   minio:
-    image: quay.io/minio/minio
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
     container_name: nestjs-chat-minio
     command: 'server /data --console-address ":9001"'
     ports:
@@ -47,7 +47,7 @@ services:
 
   # Create the nestjs-chat bucket automatically
   create-minio-bucket:
-    image: minio/mc # Use the MinIO Client image
+    image: minio/mc:RELEASE.2025-04-16T18-13-26Z
     container_name: nestjs-chat-minio-mc
     depends_on:
       minio:
