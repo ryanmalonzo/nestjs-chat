@@ -43,25 +43,31 @@ cd api && npm i
 npx prisma migrate dev
 ```
 
-6. Start the backend server
+6. Run the database seed script
+
+```bash
+npx prisma db seed
+```
+
+7. Start the backend server
 
 ```bash
 npm run start:dev # or npm run dev
 ```
 
-7. Install the frontend dependencies
+8. Install the frontend dependencies
 
 ```bash
 cd ../frontend && npm i
 ```
 
-8. Start the frontend server
+9. Start the frontend server
 
 ```bash
 npm run dev
 ```
 
-9. Open [http://localhost:5173](http://localhost:5173) in your browser to use the application
+10. Open [http://localhost:5173](http://localhost:5173) in your browser to use the application
 
 ## Improvements
 
