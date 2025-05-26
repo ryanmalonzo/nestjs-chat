@@ -115,6 +115,8 @@ export function ProfileDialog({
     await refreshUserData();
 
     toast.success("Profil mis à jour avec succès");
+
+    window.location.reload();
   };
 
   return (
