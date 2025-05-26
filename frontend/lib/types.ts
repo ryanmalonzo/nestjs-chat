@@ -5,6 +5,8 @@ export interface RegisterUserDto {
 
 export type LoginUserDto = RegisterUserDto;
 
+export type ChatBubbleColor = 'blue' | 'indigo' | 'pink' | 'red' | 'orange' | 'amber' | 'emerald';
+
 export interface JwtResponse {
   accessToken: string;
 }
@@ -14,6 +16,7 @@ export interface UserResponse {
   username: string;
   email: string;
   profilePictureUrl?: string;
+  chatBubbleColor?: ChatBubbleColor;
   createdAt: string;
   updatedAt: string;
 }
@@ -30,6 +33,7 @@ export interface MessageResponse {
     username: string;
     email: string;
     profilePictureUrl: string | null;
+    chatBubbleColor?: ChatBubbleColor;
     createdAt: string;
     updatedAt: string;
   };

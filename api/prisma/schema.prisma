@@ -7,14 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ChatBubbleColor {
+  blue
+  indigo
+  pink
+  red
+  orange
+  amber
+  emerald
+}
+
 model User {
-  identifier        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  username          String    @unique
-  email             String    @unique
+  identifier        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username          String          @unique
+  email             String          @unique
   hashedPassword    String
   profilePictureUrl String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @default(now()) @updatedAt
+  chatBubbleColor   ChatBubbleColor @default(red)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @default(now()) @updatedAt
   Message           Message[]
 }
 

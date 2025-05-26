@@ -15,13 +15,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FileWithPreview, useFileUpload } from "@/hooks/use-file-upload";
 import { api } from "@/lib/api";
-import { UploadUrlResponseType, UserResponse } from "@/lib/types";
+import { ChatBubbleColor, UploadUrlResponseType, UserResponse } from "@/lib/types";
 import { refreshUserData } from "@/lib/utils";
 import ky from "ky";
 import { ImagePlusIcon, UserRoundIcon } from "lucide-react";
 import Image from "next/image";
 import { InputHTMLAttributes, useId, useState } from "react";
 import { toast } from "sonner";
+import ColorPicker from "./color-picker";
 
 export function ProfileDialog({
   user,
@@ -83,6 +84,7 @@ export function ProfileDialog({
   // User Fields
   const [username, setUsername] = useState(user.username);
   const [email, setEmail] = useState(user.email);
+  const [chatBubbleColor, setChatBubbleColor] = useState<ChatBubbleColor>(user.chatBubbleColor || "red");
 
   const handleSubmit = async () => {
     // Handle profile picture change
@@ -98,6 +100,7 @@ export function ProfileDialog({
       json: {
         username,
         email,
+        chatBubbleColor,
       },
     });
 
@@ -171,6 +174,15 @@ export function ProfileDialog({
                     required
                   />
                 </div>
+              </div>
+
+              {/* Chat Bubble Color */}
+              <div className="*:not-first:mt-2">
+                <ColorPicker
+                  title="Couleur des bulles de chat"
+                  value={chatBubbleColor}
+                  onValueChange={setChatBubbleColor}
+                />
               </div>
             </form>
           </div>

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@prisma/client';
+import { ChatBubbleColor, User } from '@prisma/client';
 import { IsOptional } from 'class-validator';
 
 export class PartialUserDto implements Partial<Omit<User, 'hashedPassword'>> {
@@ -18,6 +18,10 @@ export class PartialUserDto implements Partial<Omit<User, 'hashedPassword'>> {
   @ApiProperty({ description: 'Profile picture URL' })
   @IsOptional()
   profilePictureUrl?: string | null;
+
+  @ApiProperty({ description: 'Chat bubble color', enum: ChatBubbleColor })
+  @IsOptional()
+  chatBubbleColor?: ChatBubbleColor;
 
   @ApiProperty({ description: 'Creation timestamp' })
   @IsOptional()

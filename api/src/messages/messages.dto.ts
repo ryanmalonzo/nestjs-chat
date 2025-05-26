@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
+import { ChatBubbleColor, Prisma } from '@prisma/client';
 
 export type MessagesResponseType = Prisma.MessageGetPayload<{
   include: {
@@ -93,6 +93,7 @@ export class MessagesResponseDto implements MessagesResponseType {
     username: string;
     email: string;
     profilePictureUrl: string | null;
+    chatBubbleColor: ChatBubbleColor;
     createdAt: Date;
     updatedAt: Date;
   };

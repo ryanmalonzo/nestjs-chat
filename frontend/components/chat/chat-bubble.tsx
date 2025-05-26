@@ -1,6 +1,16 @@
-import { MessageResponse } from "@/lib/types";
+import { ChatBubbleColor, MessageResponse } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ChatAvatar } from "./chat-avatar";
+
+const colorClasses: Record<ChatBubbleColor, string> = {
+  blue: "bg-blue-500 text-white",
+  indigo: "bg-indigo-500 text-white", 
+  pink: "bg-pink-500 text-white",
+  red: "bg-red-500 text-white",
+  orange: "bg-orange-500 text-white",
+  amber: "bg-amber-500 text-white",
+  emerald: "bg-emerald-500 text-white",
+};
 
 interface ChatBubbleProps {
   userIdentifier: string;
@@ -12,7 +22,9 @@ export default function ChatBubble({
   message,
 }: ChatBubbleProps) {
   const isOwnMessage = userIdentifier === message.fromUser.identifier;
-  const extraBubbleClasses = isOwnMessage ? "self-end" : "self-start bg-muted";
+  const userColor = message.fromUser.chatBubbleColor || "red";
+  const bubbleColorClasses = colorClasses[userColor]; // Always use the author's color
+  const extraBubbleClasses = isOwnMessage ? "self-end" : "self-start";
   const extraMetadataClasses = isOwnMessage ? "self-end ml-0 mr-2" : "";
 
   const formatDateString = (dateString: string) => {
@@ -51,7 +63,8 @@ export default function ChatBubble({
       </div>
       <div
         className={cn(
-          "flex lg:max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm bg-primary text-primary-foreground",
+          "flex lg:max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm",
+          bubbleColorClasses,
           extraBubbleClasses
         )}
       >
