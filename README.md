@@ -69,13 +69,24 @@ npm run dev
 
 10. Open [http://localhost:5173](http://localhost:5173) in your browser to use the application
 
+## Default User Accounts
+
+After running the database seed script, the following default user accounts are available for testing:
+
+| Email          | Password |
+| -------------- | -------- |
+| esgi1@myges.fr | esgi1    |
+| esgi2@myges.fr | esgi2    |
+
+You can use these credentials to log in and test the chat application.
+
 ## Improvements
 
 - [x] Logout Button
 - [x] Usernames
 - [x] Avatars
 - [x] User Profiles
-- [ ] Multiple Channels
+- [x] Multiple Channels
 - [ ] Dynamic Channel Creation
 - [ ] Image Support
 - [ ] Emoji Reaction Support
