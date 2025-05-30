@@ -1,0 +1,14 @@
+{
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "scripts": {
+    "install": "concurrently \"npm run install:api\" \"npm run install:frontend\"",
+    "install:api": "cd api && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "migrate": "cd api && npx prisma migrate reset --force",
+    "start": "concurrently \"npm run start:api\" \"npm run start:frontend\"",
+    "start:api": "cd api && npm run dev",
+    "start:frontend": "cd frontend && npm run dev"
+  }
+}

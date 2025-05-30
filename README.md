@@ -1,10 +1,23 @@
 # nestjs-chat
 
+A real-time chat application built with Next.js and NestJS, featuring user authentication, multiple channels, and a modern UI.
+
+![Screenshot](https://raw.githubusercontent.com/ryanmalonzo/nestjs-chat/main/docs/NestRTC.png)
+
+## Features
+
+- User authentication with JWT
+- Real-time messaging using WebSockets
+- Multiple chat channels
+- User profiles with avatars
+- Chat bubble color customization
+
 ## Tech Stack
 
 - Next.js
 - NestJS
 - PostgreSQL
+- S3 (MinIO)
 
 ## Prerequisites
 
@@ -25,49 +38,31 @@ git clone https://github.com/ryanmalonzo/nestjs-chat
 cd nestjs-chat
 ```
 
-3. Run the database
+3. Run the Docker containers
 
 ```bash
 docker compose up -d
 ```
 
-4. Install the backend dependencies
+4. Install the project dependencies
 
 ```bash
-cd api && npm i
+npm install # or npm i
 ```
 
-5. Run the database migrations
+5. Run the database migrations and seed the database
 
 ```bash
-npx prisma migrate dev
+npm run migrate
 ```
 
-6. Run the database seed script
+6. Start the application
 
 ```bash
-npx prisma db seed
+npm start
 ```
 
-7. Start the backend server
-
-```bash
-npm run start:dev # or npm run dev
-```
-
-8. Install the frontend dependencies
-
-```bash
-cd ../frontend && npm i
-```
-
-9. Start the frontend server
-
-```bash
-npm run dev
-```
-
-10. Open [http://localhost:5173](http://localhost:5173) in your browser to use the application
+7. Open [http://localhost:5173](http://localhost:5173) in your browser to use the application
 
 ## Default User Accounts
 
